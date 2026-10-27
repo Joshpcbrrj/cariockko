@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title>Passo 2: adicionar créditos em Billing</title>
+  <rect width="800" height="420" rx="16" fill="#f1f5f9"/>
+  <rect x="40" y="30" width="720" height="360" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <path d="M40 42a12 12 0 0 1 12-12h696a12 12 0 0 1 12 12v32H40z" fill="#e2e8f0"/>
+  <circle cx="64" cy="52" r="6" fill="#f87171"/>
+  <circle cx="84" cy="52" r="6" fill="#fbbf24"/>
+  <circle cx="104" cy="52" r="6" fill="#34d399"/>
+  <rect x="130" y="40" width="520" height="24" rx="12" fill="#ffffff" stroke="#94a3b8"/>
+  <text x="148" y="57" font-size="14" fill="#0f172a">platform.openai.com/settings/organization/billing</text>
+  <rect x="40" y="74" width="170" height="316" fill="#f8fafc"/>
+  <text x="60" y="110" font-size="14" fill="#64748b">Settings</text>
+  <text x="60" y="140" font-size="14" fill="#64748b">General</text>
+  <rect x="50" y="154" width="150" height="30" rx="6" fill="#e0e7ff"/>
+  <text x="60" y="174" font-size="14" font-weight="600" fill="#312e81">Billing</text>
+  <text x="60" y="210" font-size="14" fill="#64748b">Limits</text>
+  <text x="240" y="118" font-size="24" font-weight="600" fill="#0f172a">Billing</text>
+  <text x="240" y="160" font-size="14" fill="#64748b">Credit balance</text>
+  <text x="240" y="196" font-size="30" font-weight="600" fill="#0f172a">$0.00</text>
+  <rect x="240" y="226" width="220" height="44" rx="8" fill="#0f172a"/>
+  <text x="350" y="254" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">Add to credit balance</text>
+  <rect x="232" y="218" width="236" height="60" rx="12" fill="none" stroke="#4f46e5" stroke-width="4"/>
+  <circle cx="510" cy="248" r="20" fill="#4f46e5"/>
+  <text x="510" y="255" font-size="20" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+  <text x="540" y="232" font-size="14" fill="#312e81">Adicione créditos</text>
+  <text x="540" y="252" font-size="14" fill="#312e81">(mínimo de US$ 5)</text>
+  <text x="540" y="272" font-size="14" fill="#312e81">com cartão de crédito</text>
+  <text x="240" y="330" font-size="13" fill="#64748b">A assinatura do ChatGPT (Plus/Pro) não inclui créditos para a API.</text>
+</svg>

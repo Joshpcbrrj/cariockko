@@ -96,7 +96,7 @@ Switch themes with **Theme** in the navigation. The preference is saved in the b
 
 - Windows, macOS, or Linux.
 - Docker Desktop or Docker Engine with Docker Compose v2.
-- For cloud mode: a valid OpenAI API key and internet access.
+- For cloud mode: a valid OpenAI API key with credits, and internet access ([how to get a key](#how-to-get-an-openai-api-key)).
 - For local mode: Ollama with the configured model, plus compatible local speech-to-text (STT) and text-to-speech (TTS) services.
 - For development/testing: Node.js 22 or a version compatible with the project packages.
 
@@ -121,7 +121,7 @@ The installer:
 1. checks that Docker is installed and running;
 2. downloads the [latest published release](https://github.com/Joshpcbrrj/cariockko/releases/latest) of Cariockko;
 3. creates `.env` with random database and storage passwords;
-4. asks for your OpenAI key without showing it. If you press Enter without typing one, it checks whether [local AI](#local-ai-with-ollama) is ready and uses that mode;
+4. asks for your OpenAI key without showing it ([see how to get a key](#how-to-get-an-openai-api-key)). If you press Enter without typing one, it checks whether [local AI](#local-ai-with-ollama) is ready and uses that mode;
 5. starts the services and opens [http://localhost:3000](http://localhost:3000).
 
 | System | Installation folder |
@@ -252,6 +252,40 @@ docker compose up -d api
 ```
 
 OpenAI requires internet access and a valid key. The key is used by the backend; do not put it in browser code or share it.
+
+#### How to get an OpenAI API key
+
+API usage is pay-as-you-go and billed separately from ChatGPT: a ChatGPT Plus or Pro subscription does **not** include API access.
+
+> The images below are simplified illustrations, annotated in Portuguese. The real OpenAI site may look different, but the addresses and button names are the same.
+
+**1. Create an account** at [platform.openai.com/signup](https://platform.openai.com/signup) and confirm your email. If you already use ChatGPT, you can sign in with the same account. OpenAI may ask you to verify a phone number.
+
+![Illustration: OpenAI sign-up page](docs/images/openai-key/01-conta.svg)
+
+**2. Add credits** in [Billing](https://platform.openai.com/settings/organization/billing/overview): click **Add to credit balance** and enter a credit card. The minimum is US$5. Without credits, the key exists but does not work.
+
+![Illustration: Billing page with the Add to credit balance button](docs/images/openai-key/02-creditos.svg)
+
+**3. Create the key** in [API keys](https://platform.openai.com/api-keys): click **Create new secret key**, give it a name (for example, `Cariockko`), keep the default project, and click **Create secret key**.
+
+![Illustration: API keys page with the Create new secret key button](docs/images/openai-key/03-criar-chave.svg)
+
+**4. Copy the key** with the **Copy** button. It starts with `sk-` and is **shown only once**: if you close the window without copying it, delete that key and create another.
+
+![Illustration: Save your key dialog with the Copy button](docs/images/openai-key/04-copiar-chave.svg)
+
+**5. Paste the key into the installer.** Run the [install command](#quick-start) and paste the key when asked. Nothing appears while you paste, because the key is hidden on purpose; just press Enter. If Cariockko is already installed, running the command again works too: it asks for the key while none is configured.
+
+![Illustration: Cariockko installer asking for the OpenAI key](docs/images/openai-key/05-instalador.svg)
+
+Done: open **Settings** in Cariockko and check that OpenAI shows as configured.
+
+Security and cost tips:
+
+- Treat the key like a password: do not send it in messages, publish it, or include it in screenshots.
+- In [Limits](https://platform.openai.com/settings/organization/limits), you can set a monthly spending limit.
+- If the key leaks, delete it in [API keys](https://platform.openai.com/api-keys) and create a new one.
 
 ### Local AI with Ollama
 
@@ -510,6 +544,7 @@ docker compose run --rm api npm run seed-lessons
 │   ├── src/app.ts               # Testable Express app composition
 │   └── src/*.spec.ts            # Unit and integration tests
 ├── db/                          # PostgreSQL initialization
+├── docs/images/                 # Tutorial illustrations
 ├── docs/screenshots/            # Images used by this documentation
 ├── installer/                   # Inno Setup recipe
 ├── scripts/                     # Installers (Windows, macOS, and Linux)

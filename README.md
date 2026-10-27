@@ -96,7 +96,7 @@ Alterne o tema pela opção **Tema** na navegação. A preferência fica salva n
 
 - Windows, macOS ou Linux.
 - Docker Desktop ou Docker Engine com Docker Compose v2.
-- Para o modo OpenAI: uma chave de API válida e acesso à internet.
+- Para o modo OpenAI: uma chave de API válida, com créditos, e acesso à internet ([como obter uma chave](#como-obter-uma-chave-da-openai)).
 - Para o modo local: Ollama com o modelo configurado, além de serviços locais compatíveis de transcrição de áudio (STT) e síntese de voz (TTS).
 - Para desenvolver/testar: Node.js 22 ou versão compatível com os projetos.
 
@@ -121,7 +121,7 @@ O instalador:
 1. confere se o Docker está instalado e em execução;
 2. baixa a [última versão publicada](https://github.com/Joshpcbrrj/cariockko/releases/latest) do Cariockko;
 3. cria o `.env` com senhas aleatórias para o banco e o armazenamento;
-4. pede a chave da OpenAI sem exibi-la na tela. Se você pressionar Enter sem digitar nada, ele verifica se a [IA local](#ia-local-com-ollama) está pronta e usa esse modo;
+4. pede a chave da OpenAI sem exibi-la na tela ([veja como obter uma chave](#como-obter-uma-chave-da-openai)). Se você pressionar Enter sem digitar nada, ele verifica se a [IA local](#ia-local-com-ollama) está pronta e usa esse modo;
 5. inicia os serviços e abre [http://localhost:3000](http://localhost:3000).
 
 | Sistema | Pasta de instalação |
@@ -252,6 +252,40 @@ docker compose up -d api
 ```
 
 O provedor OpenAI requer internet e uma chave válida. A chave é usada no backend e não deve ser colocada no código do navegador nem compartilhada.
+
+#### Como obter uma chave da OpenAI
+
+A chave da API é paga por uso e é cobrada separadamente da assinatura do ChatGPT: ter o ChatGPT Plus ou Pro **não** dá acesso à API.
+
+> As imagens abaixo são ilustrações simplificadas. A tela real do site da OpenAI pode ter outro visual, mas os endereços e os nomes dos botões são os mesmos.
+
+**1. Crie uma conta** em [platform.openai.com/signup](https://platform.openai.com/signup) e confirme o e-mail. Se você já usa o ChatGPT, pode entrar com a mesma conta. A OpenAI pode pedir a confirmação de um número de celular.
+
+![Ilustração: tela de criação de conta da OpenAI](docs/images/openai-key/01-conta.svg)
+
+**2. Adicione créditos** em [Billing](https://platform.openai.com/settings/organization/billing/overview): clique em **Add to credit balance** e informe um cartão de crédito. O valor mínimo é US$ 5. Sem créditos, a chave existe, mas não funciona.
+
+![Ilustração: página Billing com o botão Add to credit balance](docs/images/openai-key/02-creditos.svg)
+
+**3. Crie a chave** em [API keys](https://platform.openai.com/api-keys): clique em **Create new secret key**, dê um nome (por exemplo, `Cariockko`), mantenha o projeto padrão e clique em **Create secret key**.
+
+![Ilustração: página API keys com o botão Create new secret key](docs/images/openai-key/03-criar-chave.svg)
+
+**4. Copie a chave** com o botão **Copy**. Ela começa com `sk-` e **só aparece uma vez**: se você fechar a janela sem copiar, apague essa chave e crie outra.
+
+![Ilustração: janela Save your key com o botão Copy](docs/images/openai-key/04-copiar-chave.svg)
+
+**5. Cole a chave no instalador.** Execute o [comando de instalação](#instalação-rápida) e cole a chave quando ele pedir. Nada aparece enquanto você cola, porque a chave fica oculta de propósito; basta teclar Enter. Se o Cariockko já estiver instalado, rodar o comando de novo também serve: ele pede a chave enquanto ela não estiver configurada.
+
+![Ilustração: instalador do Cariockko pedindo a chave da OpenAI](docs/images/openai-key/05-instalador.svg)
+
+Pronto: abra **Ajustes** no Cariockko e confira que a OpenAI aparece como configurada.
+
+Dicas de segurança e custo:
+
+- Trate a chave como uma senha: não a envie por mensagem, não a publique e não a coloque em capturas de tela.
+- Em [Limits](https://platform.openai.com/settings/organization/limits), você pode definir um limite de gastos mensal.
+- Se a chave vazar, apague-a em [API keys](https://platform.openai.com/api-keys) e crie outra.
 
 ### IA local com Ollama
 
@@ -510,6 +544,7 @@ docker compose run --rm api npm run seed-lessons
 │   ├── src/app.ts               # Montagem testável da aplicação Express
 │   └── src/*.spec.ts            # Testes unitários e de integração
 ├── db/                          # Inicialização PostgreSQL
+├── docs/images/                 # Ilustrações dos tutoriais
 ├── docs/screenshots/            # Capturas usadas nesta documentação
 ├── installer/                   # Receita do Inno Setup
 ├── scripts/                     # Instaladores (Windows, macOS e Linux)
