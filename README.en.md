@@ -400,3 +400,9 @@ docker compose run --rm api npm run seed-lessons
 ## Credits and origin
 
 This project is a fork of the [original Cariockko repository](https://github.com/araujgom/cariockko), created by [araujgom](https://github.com/araujgom). We thank the author for making the original project open source and providing the foundation for this work.
+
+## Differences from the original
+
+This fork adds local AI with Ollama, a settings page, dark mode, a redesigned interface, lesson PDF export, a Windows installer, E2E tests with CI, and English documentation to the original project.
+
+See the full breakdown (in Portuguese) in [DIFERENCAS.md](DIFERENCAS.md).

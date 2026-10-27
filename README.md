@@ -23,6 +23,7 @@
 - [Estrutura do repositório](#estrutura-do-repositório)
 - [Solução de problemas](#solução-de-problemas)
 - [Créditos e origem](#créditos-e-origem)
+- [Diferenças em relação ao original](#diferenças-em-relação-ao-original)
 
 ## O que é o Cariockko
 
@@ -423,3 +424,9 @@ docker compose run --rm api npm run seed-lessons
 ## Créditos e origem
 
 Este projeto é um fork do [Cariockko original](https://github.com/araujgom/cariockko), criado por [araujgom](https://github.com/araujgom). Agradecemos ao autor por disponibilizar o projeto original como código aberto, que serviu de base para este trabalho.
+
+## Diferenças em relação ao original
+
+Este fork acrescenta ao projeto original o uso de IA local com Ollama, uma página de ajustes, o modo escuro, um novo visual, a exportação de lições em PDF, um instalador para Windows, testes E2E com CI e documentação em inglês.
+
+Veja o detalhamento completo em [DIFERENCAS.md](DIFERENCAS.md).
