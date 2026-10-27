@@ -82,6 +82,12 @@ Confira a disponibilidade dos serviços locais e escolha o provedor para esta in
 
 ![Configurações de provedor de IA](docs/screenshots/05-ai-settings.png)
 
+### Modo escuro
+
+Alterne o tema pela opção **Tema** na navegação. A preferência fica salva no navegador.
+
+![Player de lição no modo escuro](docs/screenshots/06-dark-mode.png)
+
 > As capturas são imagens da interface com conteúdo de demonstração e dados simulados; elas não representam a disponibilidade de serviços de IA.
 
 ## Requisitos

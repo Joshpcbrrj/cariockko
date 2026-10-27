@@ -82,6 +82,12 @@ Check local services and choose the provider for this installation.
 
 ![AI provider settings](docs/screenshots/05-ai-settings.png)
 
+### Dark mode
+
+Switch themes with **Theme** in the navigation. The preference is saved in the browser.
+
+![Lesson player in dark mode](docs/screenshots/06-dark-mode.png)
+
 > These screenshots show the interface with demonstration content and mocked data; they do not indicate that AI services are available.
 
 ## Requirements

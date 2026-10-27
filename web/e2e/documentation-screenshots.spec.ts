@@ -48,6 +48,16 @@ test("capture documentation screenshots", async ({ page }) => {
     path: join(screenshotDirectory, "05-ai-settings.png"),
     fullPage: true,
   });
+
+  await page.evaluate(() => window.localStorage.setItem("cariockko-theme", "dark"));
+  await page.goto("/lesson/e2e-lesson");
+  await expect(page.getByRole("heading", { name: "At the Café" })).toBeVisible();
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await hideDevelopmentBadge(page);
+  await page.screenshot({
+    path: join(screenshotDirectory, "06-dark-mode.png"),
+    fullPage: true,
+  });
 });
 
 async function hideDevelopmentBadge(page: import("@playwright/test").Page) {
