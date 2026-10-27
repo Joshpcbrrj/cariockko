@@ -1,8 +1,11 @@
-import { ChatOpenAI } from "@langchain/openai";
-import OpenAI from "openai";
 import { toFile } from "openai";
-
-const openai = new OpenAI();
+import {
+  createAudioClient,
+  createChatModel,
+  getAudioModel,
+  getAIProvider,
+  getAIProviderConfiguration,
+} from "../lib/ai-provider.js";
 
 interface DialogueLine {
   order_index: number;
@@ -29,6 +32,7 @@ interface TutorFeedback {
 export async function speakingTutorAgent(
   input: SpeakingTutorInput
 ): Promise<TutorFeedback> {
+  const provider = getAIProvider();
   console.log(`[speaking-tutor] Starting analysis. Buffer size: ${input.audioBuffer.length} bytes, Expected: "${input.expectedText}"`);
 
   if (!input.audioBuffer || input.audioBuffer.length === 0) {
@@ -40,7 +44,7 @@ export async function speakingTutorAgent(
     };
   }
 
-  if (!process.env.OPENAI_API_KEY) {
+  if (provider === "openai" && !getAIProviderConfiguration().openaiConfigured) {
     console.error("[speaking-tutor] OPENAI_API_KEY not set");
     return {
       is_correct: false,
@@ -54,7 +58,9 @@ export async function speakingTutorAgent(
     transcription = await transcribeWithRetry(
       input.audioBuffer,
       input.audioFilename,
-      input.audioMimeType
+      input.audioMimeType,
+      2,
+      provider
     );
     console.log(`[speaking-tutor] Transcription result: "${transcription}"`);
   } catch (err) {
@@ -81,7 +87,8 @@ export async function speakingTutorAgent(
     feedback = await evaluateSpeech(
       input.lessonContext,
       input.expectedText,
-      transcription
+      transcription,
+      provider
     );
     console.log(`[speaking-tutor] Evaluation result: correct=${feedback.is_correct}`);
   } catch (err) {
@@ -101,9 +108,10 @@ async function transcribeWithRetry(
   buffer: Buffer,
   filename?: string,
   mimeType?: string,
-  maxRetries = 2
+  maxRetries = 2,
+  provider = getAIProvider()
 ): Promise<string> {
-  // Derive a sensible filename/mime so OpenAI sniffs the format correctly.
+  // Derive a filename and MIME type that the selected transcription service can recognize.
   // iOS Safari sends audio/mp4; Chromium/Firefox send audio/webm.
   const baseMime = (mimeType ?? "audio/webm").split(";")[0]!.trim().toLowerCase();
   const extByMime: Record<string, string> = {
@@ -126,9 +134,10 @@ async function transcribeWithRetry(
         `[speaking-tutor] Transcription attempt ${attempt + 1}/${maxRetries + 1} (name=${finalName}, type=${finalType})`
       );
       const file = await toFile(buffer, finalName, { type: finalType });
-      const transcription = await openai.audio.transcriptions.create({
+      const client = createAudioClient("transcription", provider);
+      const transcription = await client.audio.transcriptions.create({
         file,
-        model: "gpt-4o-mini-transcribe",
+        model: getAudioModel("transcription", provider),
       });
       return transcription.text;
     } catch (err) {
@@ -144,12 +153,10 @@ async function transcribeWithRetry(
 async function evaluateSpeech(
   context: DialogueLine[],
   expectedText: string,
-  transcription: string
+  transcription: string,
+  provider: ReturnType<typeof getAIProvider>
 ): Promise<TutorFeedback> {
-  const llm = new ChatOpenAI({
-    model: process.env.OPENAI_MODEL_CHAT ?? "gpt-4o-mini",
-    temperature: 0.3,
-  });
+  const llm = createChatModel(0.3, provider);
 
   const contextText = context
     .map((l) => `${l.speaker}: ${l.english_text}`)

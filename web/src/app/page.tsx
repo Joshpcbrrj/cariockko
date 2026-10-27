@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
 import { apiFetch } from "@/lib/api";
-import { Sparkles, BookOpen } from "lucide-react";
+import { Sparkles, BookOpen, ArrowUpRight, Headphones, Mic2, Library } from "lucide-react";
 
 const levels = [
   {
@@ -33,102 +33,119 @@ interface Lesson {
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  let totalLessons = 0;
+  let lessons: Lesson[] = [];
   try {
-    const lessons = await apiFetch<Lesson[]>("/api/lessons");
-    totalLessons = lessons.length;
+    lessons = await apiFetch<Lesson[]>("/api/lessons");
   } catch {
-    totalLessons = 0;
+    lessons = [];
   }
+  const totalLessons = lessons.length;
+  const lessonCounts = lessons.reduce<Record<string, number>>((counts, lesson) => {
+    counts[lesson.level] = (counts[lesson.level] ?? 0) + 1;
+    return counts;
+  }, {});
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       <Sidebar />
-      <main className="flex-1 px-4 py-6 md:px-16 md:py-12 pb-24 md:pb-12 flex flex-col gap-8 md:gap-12">
-        <div className="flex flex-col gap-3">
-          <h1 className="font-sora text-3xl md:text-[48px] font-semibold tracking-[-1px] md:tracking-[-2px] text-black">
-            Cariockko
-          </h1>
-          <p className="font-sora text-sm text-[#5E5E5E]">
-            Aprenda inglês conversando / Practice English through interactive dialogues
-          </p>
-        </div>
+      <main className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-8 px-4 py-6 pb-24 sm:px-7 md:px-10 md:py-10 md:pb-12">
+        <header className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-600">Seu espaço de aprendizagem</p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">Olá, vamos praticar?</h1>
+          </div>
+          <Link href="/settings" aria-label="Configurações" className="hidden h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:text-indigo-700 sm:flex">
+            <span className="text-sm font-semibold">AI</span>
+          </Link>
+        </header>
 
-        {totalLessons === 0 && (
-          <div className="border border-[#E5E5E5] p-6 flex flex-col gap-3 items-start">
-            <div className="w-10 h-10 rounded-full bg-black text-[#FAFAFA] flex items-center justify-center">
-              <Sparkles size={18} />
-            </div>
-            <h2 className="font-sora text-lg font-semibold text-black">
-              Você ainda não tem lições
-            </h2>
-            <p className="font-sora text-sm text-[#5E5E5E]">
-              Comece me contando suas preferências ou gere um plano rápido com temas do dia a dia.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
-              <Link
-                href="/create-lessons?mode=guided"
-                className="inline-flex items-center justify-center gap-2 bg-black text-[#FAFAFA] px-4 py-2 font-sora text-sm hover:opacity-90"
-              >
-                <Sparkles size={16} />
-                Criar com minhas preferências
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#322B79] via-[#5549B6] to-[#7869E6] px-6 py-8 text-white shadow-xl shadow-indigo-200/60 sm:px-9 sm:py-10">
+          <div className="relative z-10 max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-medium tracking-wide text-indigo-50">
+              <Sparkles size={13} /> APRENDIZADO COM IA
+            </span>
+            <h2 className="mt-5 max-w-xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">Fale inglês com mais confiança, uma conversa por vez.</h2>
+            <p className="mt-3 max-w-lg text-sm leading-6 text-indigo-100">Pratique diálogos reais no seu ritmo e receba feedback em português para evoluir sem medo de errar.</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/create-lessons?mode=quick" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-indigo-800 shadow-sm transition hover:bg-indigo-50">
+                Criar minhas lições <ArrowUpRight size={16} />
               </Link>
-              <Link
-                href="/create-lessons?mode=quick"
-                className="inline-flex items-center justify-center gap-2 border border-[#E5E5E5] px-4 py-2 font-sora text-sm text-black hover:border-black"
-              >
-                <Sparkles size={16} />
-                Gerar plano rápido
-              </Link>
+              {totalLessons > 0 && <Link href="/lessons/beginner" className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/20">Ver biblioteca</Link>}
             </div>
           </div>
-        )}
+          <div aria-hidden className="absolute -right-14 -top-20 h-72 w-72 rounded-full border-[34px] border-white/[0.07]" />
+          <div aria-hidden className="absolute -bottom-36 right-28 h-72 w-72 rounded-full border-[1px] border-white/10" />
+          <div aria-hidden className="absolute bottom-8 right-12 hidden h-24 w-24 rotate-12 items-center justify-center rounded-3xl border border-white/20 bg-white/10 backdrop-blur sm:flex">
+            <Headphones size={38} strokeWidth={1.5} />
+          </div>
+        </section>
 
-        {totalLessons > 0 && (
-          <h2 className="font-sora text-xl md:text-2xl font-semibold tracking-[-1px] text-black">
-            Escolha seu nível / Choose your level
-          </h2>
-        )}
-
-        <div className="flex flex-col gap-4 md:gap-6">
-          {levels.map((level) => (
-            <Link key={level.id} href={`/lessons/${level.id}`} className="block">
-              <div className="flex border border-[#E5E5E5] hover:border-[#DC2626] transition-colors">
-                <div className="w-1 bg-[#DC2626] shrink-0" />
-                <div className="p-5 pl-6 flex flex-col gap-2 flex-1">
-                  <span className="font-mono text-xs font-medium tracking-[1px] text-[#5E5E5E]">
-                    {level.titlePt.toUpperCase()}
-                  </span>
-                  <h3 className="font-sora text-xl md:text-2xl font-semibold tracking-[-1px] text-black">
-                    {level.title}
-                  </h3>
-                  <p className="font-sora text-[13px] text-[#5E5E5E]">
-                    {level.description}
-                  </p>
-                </div>
-              </div>
-            </Link>
+        <section className="grid gap-4 sm:grid-cols-3">
+          {[
+            { label: "Lições na biblioteca", value: totalLessons, icon: Library, color: "bg-indigo-50 text-indigo-700" },
+            { label: "Níveis para explorar", value: 3, icon: BookOpen, color: "bg-emerald-50 text-emerald-700" },
+            { label: "Prática de conversação", value: "No seu ritmo", icon: Mic2, color: "bg-amber-50 text-amber-700" },
+          ].map(({ label, value, icon: Icon, color }) => (
+            <div key={label} className="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm shadow-slate-200/40">
+              <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${color}`}><Icon size={20} /></span>
+              <span><span className="block text-lg font-semibold tracking-tight text-slate-900">{value}</span><span className="mt-0.5 block text-xs text-slate-500">{label}</span></span>
+            </div>
           ))}
-        </div>
+        </section>
 
-        {totalLessons > 0 && (
-          <div className="flex flex-col sm:flex-row gap-3 self-start">
-            <Link
-              href="/create-lessons?mode=guided"
-              className="inline-flex items-center gap-2 font-sora text-sm text-[#5E5E5E] hover:text-black"
-            >
-              <BookOpen size={14} />
-              Criar com minhas preferências
-            </Link>
-            <Link
-              href="/create-lessons?mode=quick"
-              className="inline-flex items-center gap-2 font-sora text-sm text-[#5E5E5E] hover:text-black"
-            >
-              <Sparkles size={14} />
-              Gerar plano rápido
-            </Link>
+        <section>
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900">Escolha seu nível</h2>
+              <p className="mt-1 text-sm text-slate-500">Comece de onde você está. Você pode mudar quando quiser.</p>
+            </div>
+            {totalLessons > 0 && <span className="hidden text-xs text-slate-400 sm:inline">{totalLessons} lições disponíveis</span>}
           </div>
-        )}
+          <div className="grid gap-4 lg:grid-cols-3">
+            {levels.map((level, index) => {
+              const themes = [
+                "Vocabulário essencial e diálogos simples",
+                "Conversas do cotidiano e mais fluidez",
+                "Ideias complexas e expressão natural",
+              ];
+              const accents = [
+                "from-sky-50 to-indigo-50 text-indigo-700",
+                "from-emerald-50 to-teal-50 text-emerald-700",
+                "from-amber-50 to-orange-50 text-amber-700",
+              ];
+              return (
+                <Link key={level.id} href={`/lessons/${level.id}`} className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-200/40 transition duration-200 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/70">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${accents[index]} font-semibold`}>
+                    <span className="text-sm">0{index + 1}</span>
+                  </div>
+                  <div className="mt-5 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{level.titlePt}</p>
+                      <h3 className="mt-1 text-lg font-semibold text-slate-900">{level.title}</h3>
+                    </div>
+                    <ArrowUpRight size={18} className="text-slate-300 transition group-hover:text-indigo-600" />
+                  </div>
+                  <p className="mt-2 min-h-10 text-sm leading-5 text-slate-500">{themes[index]}</p>
+                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
+                    <span className="font-medium text-slate-600">{lessonCounts[level.id] ?? 0} lições</span>
+                    <span className="font-medium text-indigo-700">Explorar nível <span aria-hidden>→</span></span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-5 sm:flex-row sm:items-center sm:px-6">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-900">Quer praticar com um assunto que você gosta?</h2>
+            <p className="mt-1 text-xs leading-5 text-slate-600">Crie um plano personalizado com temas da sua rotina, trabalho ou viagem.</p>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/create-lessons?mode=guided" className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700"><BookOpen size={14} /> Personalizar</Link>
+            <Link href="/create-lessons?mode=quick" className="inline-flex items-center gap-2 rounded-lg border border-indigo-200 bg-white px-4 py-2.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-50"><Sparkles size={14} /> Plano rápido</Link>
+          </div>
+        </section>
       </main>
     </div>
   );

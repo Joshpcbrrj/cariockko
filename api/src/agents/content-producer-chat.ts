@@ -1,6 +1,6 @@
-import { ChatOpenAI } from "@langchain/openai";
 import { z } from "zod";
 import { pool } from "../lib/db.js";
+import { createChatModel, getAIProvider, type AIProvider } from "../lib/ai-provider.js";
 
 export const SYSTEM_PROMPT = [
   "Você é o **Content Producer** do Cariockko, um aplicativo de aprendizado de inglês para brasileiros.",
@@ -117,11 +117,12 @@ async function saveSession(sessionId: string, messages: ChatMessage[]): Promise<
  * Builds the LLM call config. Exported so tests can patch the model and
  * inspect the messages that would be sent.
  */
-export function buildChatModel() {
-  return new ChatOpenAI({
-    model: process.env.OPENAI_MODEL_CHAT ?? "gpt-4o-mini",
-    temperature: 0.4,
-  }).withStructuredOutput(PlanSchema, { name: "ContentProducerResponse" });
+export function buildChatModel(provider: AIProvider = getAIProvider()) {
+  const model = createChatModel(0.4, provider);
+  return model.withStructuredOutput(PlanSchema, {
+    name: "ContentProducerResponse",
+    ...(provider === "ollama" ? { method: "jsonMode" as const } : {}),
+  });
 }
 
 /**
@@ -178,12 +179,13 @@ export interface ChatOptions {
  */
 export async function chat(options: ChatOptions): Promise<ChatTurnResult> {
   const { sessionId, message, llmFactory } = options;
+  const provider = getAIProvider();
 
   const existing = await loadSession(sessionId);
   const history: ChatMessage[] = existing?.messages ?? [];
 
   // Run the LLM with current history + the new user message.
-  const llm = llmFactory ? llmFactory() : buildChatModel();
+  const llm = llmFactory ? llmFactory() : buildChatModel(provider);
   const llmMessages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
     { role: "system", content: SYSTEM_PROMPT },
     ...asHistory(history),

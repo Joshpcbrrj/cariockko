@@ -2,6 +2,7 @@ import { apiFetch } from "@/lib/api";
 import { LessonPlayer } from "@/components/LessonPlayer";
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
+import { LessonPdfExportButton } from "@/components/LessonPdfExportButton";
 import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -43,16 +44,16 @@ export default async function LessonPage({ params }: PageProps) {
     return (
       <div className="flex min-h-screen flex-col md:flex-row">
         <Sidebar />
-        <main className="flex-1 px-4 py-6 md:px-16 md:py-12 pb-24 md:pb-12">
+        <main className="flex-1 px-4 py-6 pb-24 sm:px-7 md:px-10 md:py-10 md:pb-12">
           <Link
             href="/"
-            className="flex items-center gap-2 px-3 py-2 min-h-[40px] border border-[#E5E5E5] text-[12px] font-sora font-medium text-black w-fit mb-6"
+            className="mb-6 inline-flex min-h-10 w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm"
           >
             <ArrowLeft size={16} />
             Voltar
           </Link>
-          <div className="flex flex-col items-center py-12 gap-2">
-            <p className="font-sora text-lg text-[#5E5E5E]">
+          <div className="flex flex-col items-center gap-2 py-12">
+            <p className="text-lg text-slate-500">
               Lição não encontrada
             </p>
           </div>
@@ -64,24 +65,33 @@ export default async function LessonPage({ params }: PageProps) {
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       <Sidebar />
-      <main className="flex-1 px-4 py-6 md:px-16 md:py-12 pb-24 md:pb-12 flex flex-col gap-6 md:gap-8">
-        <div className="flex items-center gap-3 md:gap-4 flex-wrap">
+      <main className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-6 px-4 py-6 pb-24 sm:px-7 md:px-10 md:py-10 md:pb-12">
+        <div className="flex flex-wrap items-center gap-4">
           <Link
             href={`/lessons/${lesson.level}`}
-            className="flex items-center gap-2 px-3 py-2 min-h-[40px] border border-[#E5E5E5] text-[12px] font-sora font-medium text-black"
+            className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm transition hover:border-indigo-200 hover:text-indigo-700"
           >
             <ArrowLeft size={16} />
             <span className="hidden sm:inline">Voltar para {lesson.level}</span>
             <span className="sm:hidden">Voltar</span>
           </Link>
-          <h1 className="font-sora text-xl md:text-2xl font-semibold tracking-[-1px] text-black break-words flex-1 min-w-0">
-            {lesson.title}
-          </h1>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600">{lesson.level}</p>
+            <h1 className="mt-1 break-words text-xl font-semibold tracking-tight text-slate-950 md:text-2xl">{lesson.title}</h1>
+          </div>
         </div>
 
         <LessonPlayer
           lessonId={lesson.id}
           exchanges={lesson.exchanges ?? []}
+        />
+        <LessonPdfExportButton
+          lesson={{
+            id: lesson.id,
+            title: lesson.title,
+            level: lesson.level,
+            exchanges: lesson.exchanges ?? [],
+          }}
         />
       </main>
     </div>

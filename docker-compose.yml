@@ -36,6 +36,17 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AI_PROVIDER=${AI_PROVIDER:-openai}
+      - OPENAI_MODEL_CHAT=${OPENAI_MODEL_CHAT:-gpt-4o-mini}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.1}
+      - LOCAL_STT_BASE_URL=${LOCAL_STT_BASE_URL:-http://host.docker.internal:8000/v1}
+      - LOCAL_STT_MODEL=${LOCAL_STT_MODEL:-Systran/faster-whisper-small}
+      - LOCAL_TTS_BASE_URL=${LOCAL_TTS_BASE_URL:-http://host.docker.internal:8880/v1}
+      - LOCAL_TTS_MODEL=${LOCAL_TTS_MODEL:-kokoro}
+      - LOCAL_TTS_VOICE=${LOCAL_TTS_VOICE:-af_heart}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy

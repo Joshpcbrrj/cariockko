@@ -5,6 +5,8 @@ node_modules/
 
 # testing
 coverage/
+test-results/
+playwright-report/
 
 # next.js
 .next/
@@ -13,6 +15,7 @@ out/
 # production
 build/
 dist/
+installer/output/
 
 # misc
 .DS_Store

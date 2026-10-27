@@ -32,9 +32,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try { const theme = localStorage.getItem("cariockko-theme"); const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches; if (theme === "dark" || (!theme && prefersDark)) document.documentElement.classList.add("dark"); } catch {}`,
+          }}
+        />
+      </head>
       <body
-        className={`${sora.variable} ${ibmPlexMono.variable} antialiased bg-[#FAFAFA] text-[#000000] min-h-screen`}
+        className={`${sora.variable} ${ibmPlexMono.variable} antialiased min-h-screen`}
       >
         {children}
       </body>

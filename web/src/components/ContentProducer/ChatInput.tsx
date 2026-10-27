@@ -19,15 +19,15 @@ export function ChatInput({
         e.preventDefault();
         if (!disabled) onSubmit();
       }}
-      className="border-t border-[#E5E5E5] p-3 md:p-4 bg-[#FAFAFA]"
+      className="border-t border-slate-100 bg-white p-3 md:p-4"
     >
-      <div className="flex items-center gap-2 border border-[#E5E5E5] focus-within:border-black bg-white pr-1">
+      <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 pr-1 transition focus-within:border-indigo-300 focus-within:ring-4 focus-within:ring-indigo-50">
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Descreva as lições que você quer…"
-          className="flex-1 px-3 py-3 font-sora text-sm bg-transparent outline-none placeholder:text-[#999999]"
+          className="flex-1 bg-transparent px-3 py-3 text-sm outline-none placeholder:text-slate-400"
           aria-label="Mensagem para o Content Producer"
           disabled={disabled}
         />
@@ -35,7 +35,7 @@ export function ChatInput({
           type="submit"
           disabled={disabled || !value.trim()}
           aria-label="Enviar"
-          className="w-9 h-9 rounded-full bg-black text-[#FAFAFA] flex items-center justify-center disabled:opacity-30"
+          className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:opacity-30"
         >
           <ArrowUp size={16} />
         </button>

@@ -223,15 +223,15 @@ export function ContentProducerChat({
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 max-w-3xl w-full mx-auto">
+    <div className="mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm shadow-slate-200/50">
       {error && (
-        <div className="mx-4 md:mx-0 mt-4 border border-[#DC2626] bg-[#FEF2F2] p-3 text-sm text-[#DC2626] flex items-start justify-between gap-2">
+        <div className="mx-4 mt-4 flex items-start justify-between gap-2 rounded-xl border border-rose-100 bg-rose-50 p-3 text-sm text-rose-700 md:mx-6">
           <span>{error}</span>
           <button
             type="button"
             onClick={() => setError(null)}
             aria-label="Fechar erro"
-            className="text-[#DC2626] hover:opacity-80"
+            className="text-rose-700 hover:opacity-80"
           >
             <X size={16} />
           </button>
@@ -248,14 +248,17 @@ export function ContentProducerChat({
 
       {(view === "chatting" || view === "planReview" || view === "generating" || view === "done") && (
         <>
-          <header className="px-4 md:px-0 py-4 flex items-center justify-between border-b border-[#E5E5E5]">
-            <h1 className="font-sora text-lg md:text-xl font-semibold text-black">
+          <header className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-7">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-600">Assistente de criação</p>
+              <h1 className="mt-1 text-lg font-semibold text-slate-950">
               Criar Lições
-            </h1>
+              </h1>
+            </div>
             <button
               type="button"
               onClick={startOver}
-              className="font-mono text-[11px] tracking-[1px] text-[#5E5E5E] hover:text-black"
+              className="rounded-lg px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500 transition hover:bg-slate-50 hover:text-indigo-700"
             >
               NOVA CONVERSA
             </button>
@@ -263,7 +266,7 @@ export function ContentProducerChat({
 
           <div
             ref={scrollerRef}
-            className="flex-1 overflow-y-auto px-4 md:px-0 py-6 flex flex-col gap-4"
+            className="flex-1 space-y-4 overflow-y-auto bg-slate-50/60 px-4 py-6 sm:px-7"
           >
             {messages.map((m, i) => (
               <MessageBubble
@@ -301,7 +304,7 @@ export function ContentProducerChat({
             )}
 
             {sending && (
-              <div className="self-start font-sora text-sm text-[#5E5E5E] flex items-center gap-2">
+              <div className="flex items-center gap-2 self-start text-sm text-slate-500">
                 <Loader size={14} className="animate-spin" />
                 Content Producer está pensando…
               </div>

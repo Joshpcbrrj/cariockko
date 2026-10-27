@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { pool } from "./db.js";
+import { getAIProvider, type AIProvider } from "./ai-provider.js";
 import {
   createSemaphore,
   generateAndPersistLesson,
@@ -70,6 +71,7 @@ export interface JobSnapshot {
 
 interface InternalJob {
   snapshot: JobSnapshot;
+  provider: AIProvider;
   cancelToken: { cancelled: boolean };
   subscribers: Set<(snapshot: JobSnapshot) => void>;
 }
@@ -181,6 +183,7 @@ export async function enqueueJob(
 
   const internal: InternalJob = {
     snapshot,
+    provider: getAIProvider(),
     cancelToken: { cancelled: false },
     subscribers: new Set(),
   };
@@ -228,6 +231,7 @@ async function runJob(job: InternalJob): Promise<void> {
             level: lesson.level,
             themeIndex: lessonIndex,
             themeString: lesson.theme,
+            provider: job.provider,
           });
           updateProgress(job, lessonIndex, {
             status: "completed",
@@ -285,6 +289,7 @@ export async function retryLesson(
         level: lesson.level,
         themeIndex: lessonIndex,
         themeString: lesson.theme,
+        provider: job.provider,
       });
       updateProgress(job, lessonIndex, {
         status: "completed",

@@ -3,34 +3,74 @@
 @theme {
   --font-sora: "Sora", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
-  --color-bg: #FAFAFA;
-  --color-surface: #F5F5F5;
-  --color-text-primary: #000000;
-  --color-text-secondary: #5E5E5E;
-  --color-text-tertiary: #666666;
-  --color-text-muted: #999999;
-  --color-text-on-dark: #FAFAFA;
-  --color-accent: #DC2626;
-  --color-success: #22C55E;
-  --color-info: #3B82F6;
-  --color-border: #E5E5E5;
+  --color-bg: #F6F7FB;
+  --color-surface: #FFFFFF;
+  --color-text-primary: #172033;
+  --color-text-secondary: #68738A;
+  --color-text-tertiary: #8490A5;
+  --color-text-muted: #A7B0C0;
+  --color-text-on-dark: #FFFFFF;
+  --color-accent: #6658D3;
+  --color-success: #159B72;
+  --color-info: #3982E4;
+  --color-border: #E7EAF1;
 }
 
 :root {
-  --primary: #DC2626;
-  --success: #22C55E;
-  --error: #DC2626;
+  --primary: #6658D3;
+  --success: #159B72;
+  --error: #D74C65;
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+  --color-slate-50: #0b1220;
+  --color-slate-100: #121d2e;
+  --color-slate-200: #26354a;
+  --color-slate-300: #3a4b63;
+  --color-slate-400: #9aa9be;
+  --color-slate-500: #b2bfd1;
+  --color-slate-600: #cbd5e1;
+  --color-slate-700: #dbe4f0;
+  --color-slate-800: #e8eef7;
+  --color-slate-900: #f1f5f9;
+  --color-slate-950: #f8fafc;
 }
 
 html,
 body {
   overflow-x: hidden;
+  min-height: 100%;
 }
 
 body {
   font-family: "Sora", sans-serif;
-  background-color: #FAFAFA;
-  color: #000000;
+  background-color: #F6F7FB;
+  color: #172033;
+}
+
+:root.dark body {
+  background-color: #0b1220;
+  color: #f1f5f9;
+}
+
+.dark .bg-white {
+  background-color: #111a2b;
+}
+
+.dark .bg-white\/95 {
+  background-color: rgb(17 26 43 / 95%);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: #DED9FF;
+  color: #30286F;
 }
 
 /* Safe-area helpers for iOS notch / home indicator */

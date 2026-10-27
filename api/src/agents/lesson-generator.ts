@@ -1,10 +1,13 @@
-import { ChatOpenAI } from "@langchain/openai";
-import OpenAI from "openai";
 import { z } from "zod";
 import { pool } from "../lib/db.js";
 import { uploadObject } from "../lib/storage.js";
-
-const openai = new OpenAI();
+import {
+  createAudioClient,
+  createChatModel,
+  getAudioModel,
+  getAIProvider,
+  type AIProvider,
+} from "../lib/ai-provider.js";
 
 export interface DialogueExchange {
   order_index: number;
@@ -131,11 +134,8 @@ async function titleExists(title: string): Promise<boolean> {
   return rows[0]?.exists ?? false;
 }
 
-function buildTitleModel() {
-  return new ChatOpenAI({
-    model: process.env.OPENAI_MODEL_CHAT ?? "gpt-4o-mini",
-    temperature: 0.2,
-  });
+function buildTitleModel(provider: AIProvider) {
+  return createChatModel(0.2, provider);
 }
 
 function extractTitleCandidate(raw: unknown): string | null {
@@ -174,9 +174,10 @@ async function rewriteLessonTitle(
   level: string,
   theme: string,
   draftTitle: string,
-  existingTitles: string[]
+  existingTitles: string[],
+  provider: AIProvider
 ): Promise<string> {
-  const llm = buildTitleModel();
+  const llm = buildTitleModel(provider);
   const raw = await llm.invoke([
     {
       role: "system",
@@ -205,7 +206,8 @@ export async function ensureUniqueEnglishLessonTitle(
   level: string,
   theme: string,
   draftTitle: string,
-  existingTitles: string[] = []
+  existingTitles: string[] = [],
+  provider: AIProvider = getAIProvider()
 ): Promise<string> {
   const seen = new Set(existingTitles.map(normalizeTitleKey));
   let candidate = draftTitle.trim();
@@ -216,7 +218,7 @@ export async function ensureUniqueEnglishLessonTitle(
     }
 
     const refreshed = existingTitles.concat([...seen]);
-    candidate = await rewriteLessonTitle(level, theme, candidate || theme, refreshed);
+    candidate = await rewriteLessonTitle(level, theme, candidate || theme, refreshed, provider);
   }
 
   throw new Error("Unable to generate a unique English lesson title");
@@ -244,14 +246,12 @@ async function insertLessonWithTitle(level: string, theme: string, title: string
 export async function generateLessonContent(
   level: string,
   themeIndex: number,
-  themeString?: string
+  themeString?: string,
+  provider: AIProvider = getAIProvider()
 ): Promise<{ title: string; exchanges: DialogueExchange[] }> {
   const theme = themeString?.trim() || pickTheme(level, themeIndex);
 
-  const llm = new ChatOpenAI({
-    model: process.env.OPENAI_MODEL_CHAT ?? "gpt-4o-mini",
-    temperature: 0.8,
-  });
+  const llm = createChatModel(0.8, provider);
 
   const response = await llm.invoke([
     {
@@ -306,13 +306,17 @@ Level: ${level}`,
 
 export async function generateAudio(
   text: string,
-  filename: string
+  filename: string,
+  provider: AIProvider = getAIProvider()
 ): Promise<string> {
-  const speech = await openai.audio.speech.create({
-    model: "gpt-4o-mini-tts",
-    voice: "marin",
+  const client = createAudioClient("speech", provider);
+  const local = provider === "ollama";
+  const speech = await client.audio.speech.create({
+    model: getAudioModel("speech", provider),
+    voice: local ? process.env.LOCAL_TTS_VOICE ?? "af_heart" : "marin",
     input: text,
-    instructions: "Speak in a calm and friendly tone.",
+    ...(local ? {} : { instructions: "Speak in a calm and friendly tone." }),
+    response_format: "mp3",
   });
 
   const buffer = Buffer.from(await speech.arrayBuffer());
@@ -326,6 +330,7 @@ export interface GenerateLessonOptions {
   themeIndex: number;
   /** Optional free-form topic string (overrides themeIndex lookup). */
   themeString?: string;
+  provider?: AIProvider;
   onAudioProgress?: (completed: number, total: number) => void;
 }
 
@@ -343,10 +348,21 @@ export async function generateAndPersistLesson(
   options: GenerateLessonOptions
 ): Promise<GenerateLessonResult> {
   await ensureLessonTitleIndex();
-  const { level, themeIndex, themeString, onAudioProgress } = options;
+  const {
+    level,
+    themeIndex,
+    themeString,
+    onAudioProgress,
+    provider = getAIProvider(),
+  } = options;
   const lessonLabel = themeString ?? `${level} lesson ${themeIndex + 1}`;
 
-  const { title: draftTitle, exchanges } = await generateLessonContent(level, themeIndex, themeString);
+  const { title: draftTitle, exchanges } = await generateLessonContent(
+    level,
+    themeIndex,
+    themeString,
+    provider
+  );
   const { rows: titleRows } = await pool.query<{ title: string }>(
     "SELECT title FROM lessons"
   );
@@ -356,7 +372,8 @@ export async function generateAndPersistLesson(
     level,
     themeString ?? pickTheme(level, themeIndex),
     draftTitle,
-    existingTitles
+    existingTitles,
+    provider
   );
 
   let lesson: { id: string; title: string; level: string } | null = null;
@@ -369,7 +386,8 @@ export async function generateAndPersistLesson(
         level,
         themeString ?? pickTheme(level, themeIndex),
         `${draftTitle} (${attempt + 2})`,
-        refreshedTitles
+        refreshedTitles,
+        provider
       );
       continue;
     }
@@ -392,7 +410,8 @@ export async function generateAndPersistLesson(
         level,
         themeString ?? pickTheme(level, themeIndex),
         `${draftTitle} (${attempt + 2})`,
-        refreshedTitles
+        refreshedTitles,
+        provider
       );
     }
   }
@@ -406,7 +425,8 @@ export async function generateAndPersistLesson(
     exchanges.map(async (exchange) => {
       const audioUrl = await generateAudio(
         exchange.english_text,
-        `${lesson.id}_${exchange.order_index}.mp3`
+        `${lesson.id}_${exchange.order_index}.mp3`,
+        provider
       );
 
       await pool.query(

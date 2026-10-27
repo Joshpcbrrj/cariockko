@@ -9,11 +9,11 @@ function getLevelLabel(level: "beginner" | "intermediate" | "advanced"): string 
 
 function PlanRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="py-2 flex items-center justify-between gap-3">
-      <dt className="font-mono text-[11px] tracking-[1px] text-[#5E5E5E] uppercase">
+    <div className="flex items-center justify-between gap-3 py-2">
+      <dt className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
         {label}
       </dt>
-      <dd className="text-black text-right">{value}</dd>
+      <dd className="text-right font-medium text-slate-800">{value}</dd>
     </div>
   );
 }
@@ -32,12 +32,12 @@ export function PlanCard({
   const themes = Array.from(new Set(plan.lessons.map((l) => l.theme)));
 
   return (
-    <div className="border border-[#E5E5E5] bg-white">
-      <div className="bg-black text-[#FAFAFA] px-4 py-3 flex items-center gap-2">
+    <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-white shadow-sm">
+      <div className="flex items-center gap-2 bg-indigo-50 px-4 py-3 text-indigo-800">
         <ClipboardList size={16} />
-        <h2 className="font-sora text-sm font-semibold">Plano de Geração / Generation Plan</h2>
+        <h2 className="text-sm font-semibold">Plano de Geração / Generation Plan</h2>
       </div>
-      <dl className="px-4 py-3 divide-y divide-[#E5E5E5] font-sora text-sm">
+      <dl className="divide-y divide-slate-100 px-4 py-3 text-sm">
         <PlanRow label="Número de lições" value={`${total}`} />
         <PlanRow label="Nível" value={levels.map(getLevelLabel).join(", ")} />
         <PlanRow label="Tema" value={themes.join(", ")} />
@@ -50,11 +50,11 @@ export function PlanCard({
           value={`~${plan.estimatedMinutes} min`}
         />
       </dl>
-      <div className="px-4 py-3 flex items-center justify-end gap-2 border-t border-[#E5E5E5]">
+      <div className="flex items-center justify-end gap-2 border-t border-slate-100 px-4 py-3">
         <button
           type="button"
           onClick={onEdit}
-          className="inline-flex items-center gap-2 px-3 py-2 border border-[#E5E5E5] hover:border-black font-sora text-sm"
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-indigo-200 hover:text-indigo-700"
         >
           <Pencil size={14} />
           Editar Plano
@@ -62,7 +62,7 @@ export function PlanCard({
         <button
           type="button"
           onClick={onConfirm}
-          className="inline-flex items-center gap-2 px-3 py-2 bg-[#22C55E] hover:bg-[#16A34A] text-white font-sora text-sm"
+          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
         >
           <Check size={14} />
           Confirmar e Gerar

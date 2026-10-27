@@ -50,6 +50,12 @@ CREATE TABLE IF NOT EXISTS lesson_generation_jobs (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS ai_settings (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  provider TEXT NOT NULL CHECK (provider IN ('openai', 'ollama')),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE INDEX idx_dialogue_exchanges_lesson ON dialogue_exchanges(lesson_id, order_index);
 CREATE INDEX idx_user_progress_session ON user_progress(session_id);
 CREATE INDEX idx_lessons_level ON lessons(level);

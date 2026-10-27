@@ -4,6 +4,32 @@
 
 Base URL: `http://localhost:3001` in local dev.
 
+## AI Provider Settings
+
+The selected provider applies to the whole installation and is persisted in PostgreSQL.
+The OpenAI API key is configured only on the server in `.env`; it is never returned by the API.
+
+### `GET /api/settings/ai`
+
+Returns the selected provider, whether the OpenAI key is configured, and the
+readiness of the local Ollama, transcription, and speech services. Ollama is
+ready only when the configured model is already installed.
+
+### `PUT /api/settings/ai`
+
+Selects a provider:
+```json
+{ "provider": "openai" }
+```
+
+Supported values are `openai` and `ollama`. OpenAI cannot be selected until
+`OPENAI_API_KEY` is configured. The Ollama option uses `OLLAMA_BASE_URL` and
+`OLLAMA_MODEL`; transcription and speech use `LOCAL_STT_BASE_URL` /
+`LOCAL_STT_MODEL` and `LOCAL_TTS_BASE_URL` / `LOCAL_TTS_MODEL` respectively.
+Local audio services must expose OpenAI-compatible `/audio/transcriptions` and
+`/audio/speech` endpoints. For Docker Desktop, the example URLs target services
+running on the host machine.
+
 ## Content Producer
 
 All Content Producer endpoints use browser-scoped `session_id` values like `web-<uuid>`.

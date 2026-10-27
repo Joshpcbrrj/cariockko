@@ -5,6 +5,13 @@
   "scripts": {
     "dev": "docker compose up --build",
     "seed": "docker compose run --rm api npm run seed-lessons",
-    "build": "docker compose build"
+    "build": "docker compose build",
+    "test": "npm run test:api && npm run test:web",
+    "test:api": "npm --prefix api test",
+    "test:web": "npm --prefix web test",
+    "test:e2e": "npm --prefix web run test:e2e",
+    "typecheck": "npm --prefix api run lint && npm --prefix web run typecheck",
+    "test:ci": "npm test && npm run typecheck && npm run build:api && npm run test:e2e",
+    "build:api": "npm --prefix api run build"
   }
 }

@@ -94,10 +94,10 @@ function ProcessingStatus({ phase }: { phase: ProcessingPhase }) {
   const currentIndex = phases.indexOf(phase);
 
   return (
-    <div className="border border-[#E5E5E5] p-5 mb-4">
+    <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-center gap-3">
-        <div className="animate-spin h-5 w-5 border-2 border-[#DC2626] border-t-transparent" />
-        <span className="font-sora text-sm font-medium text-[#000000]">
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+        <span className="text-sm font-medium text-slate-900">
           {PHASE_LABELS[phase]}
         </span>
       </div>
@@ -106,10 +106,10 @@ function ProcessingStatus({ phase }: { phase: ProcessingPhase }) {
           <div key={p} className="flex-1">
             <div
               className={`h-[3px] ${
-                i <= currentIndex ? "bg-[#DC2626]" : "bg-[#E5E5E5]"
+                i <= currentIndex ? "bg-indigo-600" : "bg-slate-200"
               }`}
             />
-            <span className="font-mono text-[10px] text-[#999999] mt-1 block">
+            <span className="mt-1 block font-mono text-[10px] text-slate-400">
               {p === "uploading" ? "Enviar" : p === "transcribing" ? "Transcrever" : "Avaliar"}
             </span>
           </div>
@@ -371,16 +371,17 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
 
   if (isCompleted) {
     return (
-      <div className="flex flex-col items-center py-12 gap-4">
-        <h2 className="font-sora text-2xl font-semibold tracking-[-1px] text-black">
+      <div className="flex flex-col items-center gap-4 rounded-3xl border border-emerald-100 bg-white px-6 py-14 text-center shadow-sm">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">✓</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
           Parabéns!
         </h2>
-        <p className="font-sora text-sm text-[#5E5E5E]">
+        <p className="text-sm text-slate-500">
           Você completou a lição / You completed the lesson!
         </p>
         <button
           onClick={() => window.history.back()}
-          className="mt-4 px-6 py-3 min-h-[44px] bg-[#DC2626] text-[#FAFAFA] font-sora text-[12px] font-medium"
+          className="mt-4 min-h-11 rounded-xl bg-indigo-600 px-6 py-3 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700"
         >
           Voltar às lições
         </button>
@@ -391,19 +392,19 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
   if (!currentExchange) return null;
 
   // Shared button class strings for thumb-friendly tap targets on mobile.
-  const btnBase = "min-h-[44px] font-sora text-[12px] font-medium inline-flex items-center justify-center";
-  const btnPrimary = `${btnBase} px-4 py-3 bg-[#DC2626] text-[#FAFAFA]`;
-  const btnSecondary = `${btnBase} px-4 py-3 border border-[#E5E5E5] text-black`;
-  const btnSuccess = `${btnBase} px-4 py-3 bg-[#22C55E] text-[#FAFAFA]`;
-  const btnDanger = `${btnBase} px-6 py-3 bg-[#991B1B] text-[#FAFAFA]`;
+  const btnBase = "inline-flex min-h-11 items-center justify-center rounded-xl text-xs font-semibold transition";
+  const btnPrimary = `${btnBase} bg-indigo-600 px-4 py-3 text-white shadow-sm hover:bg-indigo-700`;
+  const btnSecondary = `${btnBase} border border-slate-200 bg-white px-4 py-3 text-slate-700 hover:border-indigo-200 hover:text-indigo-700`;
+  const btnSuccess = `${btnBase} bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700`;
+  const btnDanger = `${btnBase} bg-rose-600 px-6 py-3 text-white hover:bg-rose-700`;
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <span className="font-mono text-xs text-[#5E5E5E]">{progress}</span>
-        <div className="w-full sm:w-48 h-[4px] bg-[#E5E5E5]">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-xs font-medium text-slate-500">Etapa {progress}</span>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 sm:w-56">
           <div
-            className="h-full bg-[#DC2626]"
+            className="h-full rounded-full bg-indigo-600 transition-all"
             style={{
               width: `${((currentIndex + 1) / exchanges.length) * 100}%`,
             }}
@@ -412,16 +413,16 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
       </div>
 
       {isAppTurn ? (
-        <div className="border border-[#E5E5E5] p-4 md:p-8 flex flex-col gap-4">
-          <span className="font-mono text-[12px] font-medium tracking-[1px] text-[#999999]">
-            App
+        <div className="flex flex-col gap-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
+          <span className="inline-flex w-fit rounded-full bg-indigo-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-indigo-700">
+            Ouça e pratique
           </span>
-          <p className="font-sora text-lg md:text-2xl font-semibold tracking-[-1px] text-black break-words">
+          <p className="break-words text-xl font-semibold leading-relaxed tracking-tight text-slate-950 md:text-2xl">
             {currentExchange.english_text}
           </p>
 
           {showTranslation && (
-            <p className="font-sora text-sm text-[#5E5E5E] break-words">
+            <p className="break-words rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
               {currentExchange.portuguese_translation}
             </p>
           )}
@@ -448,16 +449,16 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
           </div>
         </div>
       ) : (
-        <div className="border border-[#E5E5E5] p-4 md:p-8 flex flex-col gap-4">
-          <span className="font-mono text-[12px] font-medium tracking-[1px] text-[#999999]">
-            Sua vez / Your turn
+        <div className="flex flex-col gap-5 rounded-3xl border border-indigo-100 bg-white p-5 shadow-sm sm:p-8">
+          <span className="inline-flex w-fit rounded-full bg-amber-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-700">
+            Sua vez de falar
           </span>
-          <p className="font-sora text-lg md:text-2xl font-semibold tracking-[-1px] text-black break-words">
+          <p className="break-words text-xl font-semibold leading-relaxed tracking-tight text-slate-950 md:text-2xl">
             {currentExchange.english_text}
           </p>
 
           {showTranslation && (
-            <p className="font-sora text-sm text-[#5E5E5E] break-words">
+            <p className="break-words rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
               {currentExchange.portuguese_translation}
             </p>
           )}
@@ -502,8 +503,8 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
                   <Square size={16} />
                   Parar
                 </button>
-                <span className="flex items-center gap-2 font-mono text-xs text-[#DC2626]">
-                  <span className="w-3 h-3 bg-[#DC2626] animate-pulse" />
+                <span className="flex items-center gap-2 font-mono text-xs text-rose-600">
+                  <span className="h-3 w-3 animate-pulse rounded-full bg-rose-600" />
                   {formatDuration(recordingDuration)}
                 </span>
               </>
@@ -534,7 +535,7 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
                   Regravar
                 </button>
                 {recordingDuration > 0 && (
-                  <span className="font-mono text-xs text-[#999999]">
+                  <span className="font-mono text-xs text-slate-400">
                     Duração: {formatDuration(recordingDuration)}
                   </span>
                 )}
@@ -544,18 +545,18 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
 
           {feedback && (
             <div
-              className={`p-5 flex flex-col gap-2 ${
+              className={`flex flex-col gap-2 rounded-2xl p-5 ${
                 feedback.is_correct
-                  ? "border-l-4 border-l-[#22C55E]"
-                  : "border-l-4 border-l-[#DC2626]"
+                  ? "border border-emerald-100 bg-emerald-50/60"
+                  : "border border-rose-100 bg-rose-50/60"
               }`}
             >
               {feedback.transcription && (
                 <div>
-                  <span className="font-mono text-[10px] tracking-[1px] text-[#999999] uppercase">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                     O que você disse:
                   </span>
-                  <p className="font-sora text-sm text-[#000000] mt-1 break-words">
+                  <p className="mt-1 break-words text-sm text-slate-800">
                     &ldquo;{feedback.transcription}&rdquo;
                   </p>
                 </div>
@@ -563,18 +564,18 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
 
               <p
                 className={`font-sora text-sm font-medium break-words ${
-                  feedback.is_correct ? "text-[#22C55E]" : "text-[#DC2626]"
+                  feedback.is_correct ? "text-emerald-700" : "text-rose-700"
                 }`}
               >
                 {feedback.feedback_pt}
               </p>
 
               {!feedback.is_correct && feedback.transcription && (
-                <div className="pt-3 border-t border-[#E5E5E5]">
-                  <span className="font-mono text-[10px] tracking-[1px] text-[#999999] uppercase">
+                <div className="border-t border-slate-200 pt-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                     O que era esperado:
                   </span>
-                  <p className="font-sora text-sm text-[#000000] mt-1 break-words">
+                  <p className="mt-1 break-words text-sm text-slate-800">
                     &ldquo;{currentExchange.english_text}&rdquo;
                   </p>
                 </div>
@@ -592,8 +593,8 @@ export function LessonPlayer({ lessonId, exchanges }: LessonPlayerProps) {
                     handleRetry();
                   }
                 }}
-                className={`${btnBase} px-6 py-3 text-[#FAFAFA] ${
-                  feedback.is_correct ? "bg-[#22C55E]" : "bg-[#DC2626]"
+                className={`${btnBase} px-6 py-3 text-white ${
+                  feedback.is_correct ? "bg-emerald-600 hover:bg-emerald-700" : "bg-indigo-600 hover:bg-indigo-700"
                 }`}
               >
                 {feedback.is_correct ? "Próximo →" : "Tentar novamente"}

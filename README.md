@@ -1,501 +1,419 @@
 # Cariockko
 
-**Learn English by talking** — An open-source English language-learning app designed for the Brazilian community.
+**🌍 Aprenda inglês conversando.** O Cariockko é uma aplicação de código aberto para praticar conversação, compreensão oral e pronúncia em inglês, com apoio em português brasileiro.
 
-Cariockko gives you a safe, judgment-free environment to practice listening and speaking English through interactive, AI-powered role-play conversations.
+[English version](README.en.md)
 
-## Why Cariockko?
+![Tela inicial do Cariockko](docs/screenshots/01-home-level-selection.png)
 
-- Only ~5% of Brazilians have any knowledge of English, with less than 1–5% considered fluent
-- Many face stigma and judgment from peers while learning
-- International platforms assume basic English knowledge that most Brazilians don't have
-- Tailored courses are often prohibitively expensive
+## Índice
 
-Cariockko solves this by providing an accessible, private space where students practice at their own level with instant AI feedback in Brazilian Portuguese.
+- [O que é o Cariockko](#o-que-é-o-cariockko)
+- [Principais recursos](#principais-recursos)
+- [Capturas de tela](#capturas-de-tela)
+- [Requisitos](#requisitos)
+- [Instalação rápida](#instalação-rápida)
+- [Provedores de IA: nuvem e local](#provedores-de-ia-nuvem-e-local)
+- [Instalador do Windows](#instalador-do-windows)
+- [Como funciona](#como-funciona)
+- [Arquitetura](#arquitetura)
+- [API](#api)
+- [Testes e integração contínua](#testes-e-integração-contínua)
+- [Desenvolvimento](#desenvolvimento)
+- [Estrutura do repositório](#estrutura-do-repositório)
+- [Solução de problemas](#solução-de-problemas)
+- [Créditos e origem](#créditos-e-origem)
 
-## How It Works
+## O que é o Cariockko
 
-### Creating lessons
+O Cariockko ajuda estudantes brasileiros a praticar inglês em um ambiente acolhedor, sem necessidade de conta. A pessoa cria lições por tema e nível, participa de diálogos interativos, ouve as falas, consulta traduções e recebe feedback sobre sua produção oral em português.
 
-The **Content Producer** is an in-app assistant that creates lessons tailored to your goals. It runs in a dedicated **Criar Lições** flow — open it from the sidebar (sparkles icon) or from the homepage CTAs.
+As lições são criadas sob demanda por um assistente de IA. Elas não são geradas automaticamente na primeira inicialização. O app oferece três níveis:
 
-1. **Welcome** — pick **Criar com minhas preferências** (guided) or **Gerar plano rápido** (quick).
-2. **Conversation** — the agent asks 1–2 short questions when needed, or proposes a ready-to-run plan immediately.
-3. **Plan review** — when the agent has enough, it shows a `Generation Plan` card with the exact lessons, levels, theme, characters and estimated time. Edit if you want, or hit **Confirmar e Gerar**.
-4. **Live progress** — the generation card streams per-lesson status updates via SSE. You can navigate away and come back; the UI restores the saved chat/session state and re-attaches to the latest in-flight job.
-5. **Failures** — if any lesson fails, it shows a **TENTAR NOVAMENTE** chip that re-generates only that lesson (completed lessons are untouched).
-6. **Done** — once generation finishes, the new lessons appear in the library under their level. Hit **NOVA CONVERSA** to start over.
+- **Iniciante:** vocabulário essencial e diálogos simples.
+- **Intermediário:** situações do cotidiano e frases mais longas.
+- **Avançado:** discussões complexas e expressão mais natural.
 
-Out-of-scope requests (grammar questions, translations, "write me a poem") are redirected by a built-in guardrail.
+Use a opção **Tema** na navegação para alternar entre modo claro e escuro. A escolha fica salva neste navegador; na primeira visita, o app acompanha a preferência de aparência do sistema.
 
-### Practising a lesson
+## Principais recursos
 
-Each lesson is a scripted dialogue between two characters. You play one character; the app plays the other.
+- 🧠 Criação guiada ou rápida de planos de lições com um assistente de IA.
+- 📝 Revisão do plano antes de iniciar a geração.
+- 💬 Geração de diálogos com falas em inglês e tradução em português.
+- 📈 Acompanhamento do progresso em tempo real e possibilidade de retomar uma geração.
+- 🔄 Nova tentativa apenas para as lições que falharam; as concluídas são preservadas.
+- 🎧 Player de diálogo com tradução, áudio de referência e gravação da fala do estudante.
+- 🎙️ Avaliação da fala com transcrição e feedback em português.
+- ☁️ Escolha global entre OpenAI na nuvem e IA local com Ollama e serviços locais de áudio.
+- 📄 Exportação de uma lição completa em PDF compatível com o **Projeto Palavras**.
+- 📱 Interface responsiva, sem conta obrigatória.
+- 🌙 Modo claro e escuro, com preferência salva no navegador.
 
-```
-1. App presents a line  →  "So Todd, where are you from?"
-2. You review            →  View translation, listen to audio (reference playback available)
-3. You respond           →  Record your line
-4. AI analyzes           →  Speaking Tutor evaluates your audio
-5. Feedback delivered    →  Summary in Brazilian Portuguese
-   ✅ Correct → Proceed to next exchange
-   ❌ Incorrect → Retry until successful
-```
+## Capturas de tela
 
-## Screenshots
+### Início e seleção de nível
 
-After running `make start` and opening `http://localhost:3000`, you'll see:
+Visão geral da biblioteca e acesso à criação de lições.
 
-### 1. Home Page — Level Selection
+![Página inicial com seleção de níveis](docs/screenshots/01-home-level-selection.png)
 
-Choose between Beginner, Intermediate, and Advanced difficulty levels. New users see a CTA pointing at the Content Producer:
+### Biblioteca de lições
 
-![Home Page - Level Selection](docs/screenshots/01-home-level-selection.png)
+As lições criadas ficam organizadas por nível.
 
-### 2. Lessons List
+![Biblioteca de lições para o nível iniciante](docs/screenshots/02-lessons-list.png)
 
-Each level contains the lessons you've generated:
+### Player da lição e exportação em PDF
 
-![Lessons List](docs/screenshots/02-lessons-list.png)
+O player apresenta a fala atual e os controles de prática. O botão fixo permite exportar o diálogo e sua tradução para o Projeto Palavras.
 
-### 3. Lesson Player
+![Player de lição com botão para exportar PDF](docs/screenshots/03-lesson-player.png)
 
-Interactive dialogue with audio playback, translation, and voice recording:
+### Criação de lições
 
-![Lesson Player](docs/screenshots/03-lesson-player.png)
+Comece com um plano sugerido ou personalize a criação com o assistente.
 
-## Features
+![Tela de criação de lições](docs/screenshots/04-create-lessons.png)
 
-- **Three difficulty levels** — Beginner, Intermediate, and Advanced
-- **Interactive Content Producer** — A conversational agent that proposes a lesson plan for your approval and only generates after you confirm
-- **On-demand generation** — Lessons are no longer pre-seeded; the app boots instantly and the catalogue is built by you
-- **Plan mode** — Every generation shows a plan card (count, level, theme, characters, time) you can edit or confirm
-- **Real-time progress** — Per-lesson status (pending → generating → completed/failed) streamed over SSE
-- **Partial-failure recovery** — Failed lessons show a retry chip; completed lessons are never re-run
-- **Guardrails** — Out-of-scope requests (grammar Q&A, translation, poems) are redirected back to lesson creation
-- **Speaking Analysis & Feedback** — A Speaking Tutor Agent transcribes audio via gpt-4o-mini-transcribe and evaluates pronunciation/vocabulary
-- **AI-Generated Audio** — All listening clips use OpenAI text-to-speech (gpt-4o-mini-tts, voice: marin)
-- **Reference Playback** — Listen to AI-generated audio for any exchange to hear correct pronunciation
-- **Translation Support** — Brazilian Portuguese translation available for every dialogue line
-- **No account required** — Start practising immediately
-- **Progress tracking** — Lesson completion tracked via local session
+### Seleção do provedor de IA
 
-## Quick Start
+Confira a disponibilidade dos serviços locais e escolha o provedor para esta instalação.
 
-### Prerequisites
+![Configurações de provedor de IA](docs/screenshots/05-ai-settings.png)
 
-- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
-- [OpenAI API key](https://platform.openai.com/api-keys)
+> As capturas são imagens da interface com conteúdo de demonstração e dados simulados; elas não representam a disponibilidade de serviços de IA.
 
-### Setup
+## Requisitos
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/araujgom/cariockko.git
-cd cariockko
+- Windows, macOS ou Linux.
+- Docker Desktop ou Docker Engine com Docker Compose v2.
+- Para o modo OpenAI: uma chave de API válida e acesso à internet.
+- Para o modo local: Ollama com o modelo configurado, além de serviços locais compatíveis de transcrição de áudio (STT) e síntese de voz (TTS).
+- Para desenvolver/testar: Node.js 22 ou versão compatível com os projetos.
 
-# 2. Configure environment
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
-# Optional: Set OPENAI_MODEL_CHAT to override the default model (gpt-4o-mini)
+## Instalação rápida
 
-# 3. Start all services
-make start
-# or: docker compose up -d --build
+1. Clone o repositório e entre na pasta:
 
-# 4. Open http://localhost:3000 in your browser
-# 5. Open the "Criar" tab (sparkles icon) or use the homepage CTAs
-```
+   ```bash
+   git clone https://github.com/Joshpcbrrj/cariockko.git
+   cd cariockko
+   ```
 
-The app boots with an empty catalogue. The first time you open the **Criar Lições** flow the agent will walk you through creating your first batch of lessons.
+2. Crie o arquivo de configuração:
 
-### Verify Services
+   ```bash
+   cp .env.example .env
+   ```
 
-```bash
-# Check all services are running
-make status
-# or: docker compose ps
+   No Windows PowerShell, use:
 
-# Check API health
-curl http://localhost:3001/health/ready
-```
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-### Mobile / Phone Access (Dev)
+3. Configure o provedor desejado conforme a seção [Provedores de IA](#provedores-de-ia-nuvem-e-local).
+4. Inicie os serviços:
 
-Browsers require a **secure context** (HTTPS, or `localhost`) for
-`getUserMedia` to work. Plain HTTP on a LAN IP is silently blocked — so
-testing the microphone from a phone needs a public HTTPS URL.
+   ```bash
+   docker compose up -d --build
+   ```
 
-The simplest way is `make tunnel`, which uses
-[localhost.run](https://localhost.run/) — a clientless SSH-based tunnel
-that wraps `http://localhost:3000` in a public `https://*.lhr.life` URL.
-No certs, no LAN IP, no firewall fiddling.
+   Se o comando `make` estiver instalado, também é possível executar `make start`.
+
+5. Abra [http://localhost:3000](http://localhost:3000).
+
+O banco começa sem lições. Abra **Criar** para gerar as primeiras lições. A primeira geração com OpenAI ou Ollama necessita que o provedor esteja configurado e acessível.
+
+### Parar e verificar
 
 ```bash
-# 1. Start the stack (in one terminal)
-make start
-
-# 2. Open a tunnel (in another terminal)
-make tunnel
-# → Read the printed `https://<id>.lhr.life` URL
-# → Open it on your phone — mic works because it's a real HTTPS origin
+docker compose ps
+docker compose logs -f
+docker compose down
 ```
 
-`make tunnel` runs `ssh -R 80:localhost:3000 localhost.run`. Press `Ctrl+C`
-to close the tunnel; the local stack keeps running.
+Verificações de saúde da API:
 
-Plain `make start` (everything in Docker, HTTP on `localhost:3000`) is the
-right choice when testing from the same machine — microphone works there
-because `localhost` counts as a secure context.
-
-## Make Commands
-
-| Command | Description |
-|---------|-------------|
-| `make start` | Start all services (detached, with builds) |
-| `make stop` | Stop all services (keep volumes) |
-| `make destroy` | Stop all services, remove volumes and images (deletes all data) |
-| `make restart` | Restart all services |
-| `make logs` | Follow logs from all services |
-| `make status` | Show status of all services |
-| `make tunnel` | Expose the running stack over public HTTPS via localhost.run (for phone/mic testing) |
-| `make help` | Show available commands |
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Docker Compose                          │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │
-│  │  web (:3000) │───▶│  api (:3001) │───▶│  db (:5432)  │  │
-│  │   Next.js    │    │   Express    │    │  PostgreSQL  │  │
-│  │   (SSE-aware)│    │  + LangChain │    │              │  │
-│  └──────────────┘    └──────┬───────┘    └──────────────┘  │
-│                             │                               │
-│                             ▼                               │
-│                     ┌──────────────┐                        │
-│                     │ minio (:9000)│                        │
-│                     │  S3 Storage  │                        │
-│                     └──────────────┘                        │
-│                                                             │
-├─────────────────────────────────────────────────────────────┤
-│                     External Services                       │
-│                                                             │
-│  OpenAI API ──────────────────────────────────────────────  │
-│  ├─ GPT-4o-mini (Content Producer chat + lesson content + speech evaluation) │
-│  ├─ GPT-4o-mini-transcribe (speech-to-text)                │
-│  └─ GPT-4o-mini-tts (text-to-speech audio generation)      │
-└─────────────────────────────────────────────────────────────┘
+```text
+http://localhost:3001/health       saúde básica
+http://localhost:3001/health/live  processo ativo
+http://localhost:3001/health/ready banco acessível
 ```
 
-### Components
+`docker compose down` preserva os volumes de dados. **`docker compose down -v` remove volumes e apaga os dados locais.**
 
-| Service | Technology | Port | Purpose |
-|---------|-----------|------|---------|
-| `web` | Next.js 15 + React 19 + Tailwind CSS 4 | 3000 | Frontend UI, SSE client |
-| `api` | Express + LangChain + OpenAI | 3001 | Backend API, AI agents, SSE stream |
-| `db` | PostgreSQL 15 | 5432 | Lessons, exchanges, progress, sessions, jobs |
-| `minio` | MinIO (S3-compatible) | 9000/9001 | Audio file storage |
+## Provedores de IA: nuvem e local
 
-## API Reference
+O provedor é selecionado na tela **Ajustes** e vale para toda a instalação do Cariockko.
 
-### Health Checks
+### OpenAI na nuvem
 
-```
-GET /health          → { "status": "ok" }
-GET /health/live     → { "status": "live" }   # container liveness
-GET /health/ready    → { "status": "ready" }  # DB reachable
+Defina uma chave real no `.env`:
+
+```dotenv
+AI_PROVIDER=openai
+OPENAI_API_KEY=sua-chave
+OPENAI_MODEL_CHAT=gpt-4o-mini
 ```
 
-### Lessons
-
-```
-GET /api/lessons                    → List all lessons (optional: ?level=beginner)
-GET /api/lessons/:id                → Get lesson with dialogue exchanges
-```
-
-**Response (list):**
-```json
-[
-  {
-    "id": "uuid",
-    "title": "Meeting someone new",
-    "level": "beginner",
-    "created_at": "2025-01-01T00:00:00Z",
-    "exchange_count": 10
-  }
-]
-```
-
-**Response (detail):**
-```json
-{
-  "id": "uuid",
-  "title": "Meeting someone new",
-  "level": "beginner",
-  "exchanges": [
-    {
-      "id": "uuid",
-      "order_index": 0,
-      "speaker": "app",
-      "english_text": "Hello! My name is Aimee. What's your name?",
-      "portuguese_translation": "Olá! Meu nome é Aimee. Qual é o seu nome?",
-      "audio_url": "http://localhost:9000/audio/lessons/..."
-    }
-  ]
-}
-```
-
-### Content Producer
-
-```
-POST /api/content-producer/chat
-  body: { session_id, message }
-  → { reply, plan?, guardrail? }
-
-GET    /api/content-producer/session/:sessionId     → { session_id, messages[] }
-DELETE /api/content-producer/session/:sessionId     → { ok: true }
-
-POST /api/content-producer/generate
-  body: { session_id, plan: { lessons: [{level, theme, count}], characters, estimatedMinutes } }
-  → 202 { job_id, snapshot }
-
-GET  /api/content-producer/jobs/recent?session_id=…  → { snapshot|null }
-GET  /api/content-producer/jobs/:jobId               → JobSnapshot
-GET  /api/content-producer/jobs/:jobId/events        → Server-Sent Events
-POST /api/content-producer/jobs/:jobId/retry         → { lesson_index }
-POST /api/content-producer/jobs/:jobId/cancel
-```
-
-**SSE event types:**
-- `event: progress` → full `JobSnapshot` JSON
-- `event: done` → `{ status: "completed" | "failed" | "cancelled" }`
-
-**Plan payload:**
-```json
-{
-  "lessons": [
-    { "level": "beginner", "theme": "Ordering coffee", "count": 3 }
-  ],
-  "characters": { "app": "Aimee", "student": "Todd" },
-  "estimatedMinutes": 5
-}
-```
-
-Notes:
-- `session_id` must be a short browser session ID (`[A-Za-z0-9_-]{1,128}`)
-- Each plan item can request up to 20 lessons, with a maximum of 60 lessons per generation
-- `chat` is rate-limited at 30 messages/minute per session
-- `generate` is rate-limited at 5 requests/10 minutes per session
-- SSE emits `progress` snapshots and a final `done` event when the job completes, fails, or is cancelled
-
-### Speaking Tutor
-
-```
-POST /api/speaking-tutor
-Content-Type: multipart/form-data
-```
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `audio` | File | Yes | Audio recording (webm, mp3, wav, ogg, max 10MB) |
-| `lesson_id` | String | Yes | Lesson UUID |
-| `exchange_index` | Number | Yes | Current dialogue exchange index |
-| `expected_text` | String | Yes | The English text the student should say |
-
-**Response:**
-```json
-{
-  "is_correct": true,
-  "feedback_pt": "Muito bem! Sua pronúncia está ótima.",
-  "transcription": "Hello, my name is Todd"
-}
-```
-
-### Progress
-
-```
-POST /api/progress                  → Save lesson completion
-GET  /api/progress/:session_id      → Get completed lessons for session
-```
-
-**Request (POST):**
-```json
-{
-  "session_id": "local-storage-session-id",
-  "lesson_id": "uuid",
-  "completed": true
-}
-```
-
-## Database Schema
-
-```sql
--- Lessons (created on demand by the Content Producer)
-lessons (id, title, level, created_at)
-  level: 'beginner' | 'intermediate' | 'advanced'
-
--- Dialogue exchanges within lessons
-dialogue_exchanges (id, lesson_id, order_index, speaker, english_text, portuguese_translation, audio_url, created_at)
-  speaker: 'app' | 'student'
-
--- User progress tracking
-user_progress (id, session_id, lesson_id, completed, completed_at, created_at)
-  UNIQUE(session_id, lesson_id)
-
--- Content Producer conversation history (one row per browser session)
-content_producer_sessions (id, session_id UNIQUE, messages JSONB, created_at, updated_at)
-
--- Generation job state (so the UI can recover after navigation)
-lesson_generation_jobs (id, session_id, plan JSONB, status, progress JSONB, error, created_at, updated_at)
-```
-
-## Configuration
-
-### Environment Variables
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `OPENAI_API_KEY` | Yes | — | OpenAI API key for AI features |
-| `OPENAI_MODEL_CHAT` | No | `gpt-4o-mini` | Chat model for content generation and speech evaluation |
-| `GEN_CONCURRENCY` | No | `3` | Max lessons generated in parallel per job |
-| `SEED_CONCURRENCY` | No | `3` | Max lessons generated in parallel during the manual `seed-lessons` script |
-| `POSTGRES_DB` | No | `postgres` | PostgreSQL database name |
-| `POSTGRES_PASSWORD` | No | `local-dev-password` | PostgreSQL database password |
-| `MINIO_ROOT_USER` | No | `minioadmin` | MinIO access key |
-| `MINIO_ROOT_PASSWORD` | No | `minioadmin` | MinIO secret key |
-| `NEXT_PUBLIC_API_URL` | No | `http://localhost:3001` | API URL (client-side) |
-| `API_INTERNAL_URL` | No | `http://api:3001` | API URL (server-side, Docker) |
-
-### AI Models
-
-| Capability | Model | Purpose |
-|-----------|-------|---------|
-| Content Producer chat | `gpt-4o-mini` | Conversational planning, guardrails, structured output |
-| Lesson content | `gpt-4o-mini` | Creates lesson dialogues |
-| Speech evaluation | `gpt-4o-mini` | Analyzes student recordings |
-| Speech-to-Text | `gpt-4o-mini-transcribe` | Transcribes audio |
-| Text-to-Speech | `gpt-4o-mini-tts` (voice: marin) | Generates listening audio |
-
-## Project Structure
-
-```
-cariockko/
-├── api/                                       # Backend API
-│   ├── src/
-│   │   ├── agents/
-│   │   │   ├── content-producer.ts            # Legacy seed wrapper
-│   │   │   ├── content-producer-chat.ts       # Conversational agent (plan + guardrails)
-│   │   │   ├── lesson-generator.ts            # Pure lesson + audio generation primitives
-│   │   │   └── speaking-tutor.ts              # Speech evaluation agent
-│   │   ├── lib/
-│   │   │   ├── db.ts                          # PostgreSQL connection pool
-│   │   │   ├── storage.ts                     # MinIO/S3 client
-│   │   │   ├── sse.ts                         # Server-Sent Events helper
-│   │   │   ├── generation-queue.ts            # In-memory job runner with subscribers
-│   │   │   └── rate-limit.ts                  # Token-bucket middleware
-│   │   ├── routes/
-│   │   │   ├── lessons.ts
-│   │   │   ├── progress.ts
-│   │   │   ├── speaking-tutor.ts
-│   │   │   └── content-producer.ts            # /api/content-producer/*
-│   │   ├── scripts/
-│   │   │   └── seed-lessons.ts                # Standalone seed script (manual use)
-│   │   ├── entrypoint.ts                      # App startup; recovers interrupted jobs
-│   │   └── index.ts                           # Express server
-│   ├── Dockerfile
-│   └── package.json
-├── web/                                       # Frontend
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── page.tsx                       # Home (level selection + empty CTA)
-│   │   │   ├── create-lessons/page.tsx        # Content Producer page
-│   │   │   ├── lessons/[level]/               # Lesson list by level
-│   │   │   └── lesson/[id]/                   # Lesson player
-│   │   ├── components/
-│   │   │   ├── LessonPlayer.tsx
-│   │   │   ├── Sidebar.tsx                    # Now includes "Criar" tab
-│   │   │   └── ContentProducer/
-│   │   │       └── ContentProducerChat.tsx    # Welcome / Chat / Plan / Progress state machine
-│   │   └── lib/
-│   │       ├── api.ts                         # Typed wrappers for all endpoints
-│   │       ├── session.ts                     # Per-browser session ID (localStorage)
-│   │       └── sse.ts                         # EventSource wrapper
-│   ├── Dockerfile
-│   └── package.json
-├── db/                                        # Database initialization
-│   ├── init.sql                               # Schema (additive: content_producer_sessions, lesson_generation_jobs)
-│   └── init.sh
-├── docs/
-│   ├── DELETION_LOG.md
-│   └── screenshots/
-├── .product/
-│   ├── ideation.md
-│   └── improving-content-producer.md          # This feature's spec
-├── docker-compose.yml                         # Service orchestration
-├── Makefile                                   # Development commands
-├── .env.example                               # Environment template
-└── README.md
-```
-
-## Documentation
-
-- [Content Producer Guide](docs/GUIDES/content-producer.md)
-- [API Reference](docs/API.md)
-
-## Development
-
-### Running Locally (without Docker)
+Reinicie ou recrie a API após alterar variáveis:
 
 ```bash
-# Terminal 1: Start PostgreSQL and MinIO
-docker compose up db minio minio-init
+docker compose up -d --build api
+```
 
-# Terminal 2: Start API
+O provedor OpenAI requer internet e uma chave válida. A chave é usada no backend e não deve ser colocada no código do navegador nem compartilhada.
+
+### IA local com Ollama
+
+O uso local para texto e áudio requer **os três serviços** abaixo:
+
+1. **Ollama** para conversa, planejamento e geração de lições.
+2. Um endpoint local compatível com a API de transcrição OpenAI para STT.
+3. Um endpoint local compatível com a API de síntese de fala OpenAI para TTS.
+
+Exemplo de configuração no `.env`:
+
+```dotenv
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://host.docker.internal:11434
+OLLAMA_MODEL=llama3.1
+LOCAL_STT_BASE_URL=http://host.docker.internal:8000/v1
+LOCAL_STT_MODEL=Systran/faster-whisper-small
+LOCAL_TTS_BASE_URL=http://host.docker.internal:8880/v1
+LOCAL_TTS_MODEL=kokoro
+LOCAL_TTS_VOICE=af_heart
+```
+
+Baixe o modelo configurado no Ollama antes de usar, por exemplo:
+
+```bash
+ollama pull llama3.1
+```
+
+Os endereços de exemplo pressupõem que os serviços de áudio aceitam as rotas compatíveis `/v1/models`, `/v1/audio/transcriptions` e `/v1/audio/speech`. Esses servidores e modelos locais **não estão incluídos** no Cariockko nem no instalador.
+
+Em **Ajustes**, o app verifica o modelo Ollama, o STT e o TTS e só habilita a seleção local quando todos responderem. É possível rodar as funções de IA sem enviar conteúdo à OpenAI nesse modo, mas é necessário instalar os modelos e serviços antes. O download inicial dos modelos depende de internet; depois disso, o processamento pode ocorrer localmente, desde que os serviços estejam ligados. Docker, banco de dados e MinIO também precisam estar em execução.
+
+## Instalador do Windows
+
+O script [scripts/install-windows.ps1](scripts/install-windows.ps1) verifica o Docker Desktop, prepara o `.env`, solicita a chave OpenAI de forma protegida quando aplicável, executa `docker compose up -d --build` e abre o app no navegador.
+
+O arquivo [installer/Cariockko.iss](installer/Cariockko.iss) é a receita do instalador `.exe` com atalhos para o Menu Iniciar e, opcionalmente, para a área de trabalho. Compile-a com o Inno Setup a partir da raiz do repositório. O executável compilado não é versionado; o instalador não inclui Docker Desktop, Ollama ou modelos de IA.
+
+## Como funciona
+
+### Criar lições
+
+1. Na página **Criar**, escolha **Gerar lições sugeridas** ou **Criar com minhas preferências**.
+2. Converse com o assistente para informar tema, nível e quantidade.
+3. Revise ou ajuste o plano proposto.
+4. Confirme a geração e acompanhe o progresso em tempo real.
+5. Se alguma lição falhar, tente gerá-la novamente sem repetir as que concluíram.
+6. Encontre o material na biblioteca do nível correspondente.
+
+O assistente redireciona solicitações fora do objetivo de criação de lições. A sessão de conversa e o progresso da geração são persistidos para permitir retomada.
+
+### Praticar uma lição
+
+O estudante acompanha um diálogo com dois personagens, ouve a fala de referência, consulta a tradução e grava sua resposta. O tutor de fala transcreve e avalia a resposta, com feedback em português.
+
+O navegador exige um contexto seguro para usar o microfone: `localhost` funciona localmente; para acessar pelo celular em HTTP na rede local, use HTTPS. O comando `make tunnel` disponibiliza um túnel HTTPS via localhost.run para desenvolvimento; não o trate como configuração de produção.
+
+### Exportar para o Projeto Palavras
+
+Na página da lição, use **Exportar lição em PDF para projeto palavras**. O PDF inclui o diálogo em inglês, as falas identificadas como Aimee e Todd e a tradução em português. Também incorpora o pacote `aprendendo-palavras:v3` nos metadados PDF, para que o importador do Projeto Palavras reconheça o material como tipo `texto`.
+
+## Arquitetura
+
+```text
+Navegador
+   │
+   ▼
+Next.js (web :3000) ── proxy same-origin ──► Express (api :3001)
+                                                ├── PostgreSQL (:5432)
+                                                ├── MinIO/S3 (:9000)
+                                                └── Provedor de IA
+                                                     ├── OpenAI
+                                                     └── Ollama + STT/TTS local
+```
+
+| Serviço | Tecnologia | Uso |
+|---|---|---|
+| `web` | Next.js 15, React 19, Tailwind CSS 4 | Interface e proxy same-origin para API/áudio |
+| `api` | Express, TypeScript, LangChain e SDK OpenAI | Rotas, agentes, geração e avaliação de fala |
+| `db` | PostgreSQL 15 | Lições, diálogos, progresso, configurações e trabalhos |
+| `minio` | Armazenamento compatível com S3 | Arquivos de áudio |
+
+O produtor de conteúdo envia eventos de progresso por Server-Sent Events (SSE). O trabalho de geração é controlado pela API e seu estado é persistido para recuperação. O identificador de sessão é mantido pelo navegador; não há contas de usuário.
+
+## API
+
+A aplicação web usa a API Express. Principais rotas:
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/health`, `/health/live`, `/health/ready` | Saúde, liveness e disponibilidade do banco |
+| `GET` | `/api/lessons` | Lista lições; aceita `?level=beginner`, `intermediate` ou `advanced` |
+| `GET` | `/api/lessons/:id` | Detalha uma lição e suas falas |
+| `POST` | `/api/content-producer/chat` | Envia mensagem para o assistente |
+| `GET` / `DELETE` | `/api/content-producer/session/:sessionId` | Lê ou limpa a sessão |
+| `POST` | `/api/content-producer/generate` | Inicia um trabalho de geração |
+| `GET` | `/api/content-producer/jobs/recent` | Recupera o último trabalho de uma sessão |
+| `GET` | `/api/content-producer/jobs/:jobId` | Consulta o estado do trabalho |
+| `GET` | `/api/content-producer/jobs/:jobId/events` | Recebe eventos SSE de progresso |
+| `POST` | `/api/content-producer/jobs/:jobId/retry` | Tenta novamente uma lição com falha |
+| `POST` | `/api/content-producer/jobs/:jobId/cancel` | Cancela o trabalho |
+| `POST` | `/api/speaking-tutor` | Envia áudio para transcrição e avaliação |
+| `GET` / `POST` | `/api/progress/:sessionId`, `/api/progress` | Consulta ou registra progresso |
+| `GET` / `PUT` | `/api/settings/ai` | Consulta ou altera o provedor de IA |
+
+Consulte [docs/API.md](docs/API.md) para detalhes de payloads e respostas.
+
+## Configuração
+
+As configurações de desenvolvimento estão documentadas em [.env.example](.env.example). Variáveis principais:
+
+| Variável | Padrão / exemplo | Descrição |
+|---|---|---|
+| `AI_PROVIDER` | `openai` | Provedor inicial: `openai` ou `ollama` |
+| `OPENAI_API_KEY` | — | Chave OpenAI; necessária para o modo nuvem |
+| `OPENAI_MODEL_CHAT` | `gpt-4o-mini` | Modelo de chat OpenAI |
+| `OLLAMA_BASE_URL` | `http://host.docker.internal:11434` | Endereço do Ollama |
+| `OLLAMA_MODEL` | `llama3.1` | Modelo local instalado |
+| `LOCAL_STT_BASE_URL` | `http://host.docker.internal:8000/v1` | Endpoint local de transcrição |
+| `LOCAL_STT_MODEL` | `Systran/faster-whisper-small` | Modelo local de STT |
+| `LOCAL_TTS_BASE_URL` | `http://host.docker.internal:8880/v1` | Endpoint local de voz |
+| `LOCAL_TTS_MODEL` | `kokoro` | Modelo local de TTS |
+| `LOCAL_TTS_VOICE` | `af_heart` | Voz local |
+| `POSTGRES_DB` / `POSTGRES_PASSWORD` | `postgres` / `local-dev-password` | Banco da aplicação |
+| `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` | `minioadmin` | Credenciais do MinIO |
+| `MINIO_BUCKET` | `audio` | Bucket usado para áudio |
+| `GEN_CONCURRENCY` | `3` | Concorrência de geração |
+
+Não publique o `.env` nem credenciais reais. Os valores do `.env.example` são apenas para desenvolvimento local.
+
+## Testes e integração contínua
+
+Os testes ficam próximos ao código. As suítes incluem testes unitários, testes de integração da API com Supertest e testes de interface com Vitest/Testing Library. Os testes E2E com Playwright usam uma API simulada e não precisam de Docker, banco ou credenciais de IA.
+
+Instale as dependências em cada pacote:
+
+```bash
 cd api
-cp ../.env.example .env
-npm install
+npm ci
+cd ../web
+npm ci
+```
+
+Na raiz do repositório:
+
+```bash
+npm test              # testes unitários, de componentes e integração
+npm run typecheck     # checagem de tipos na API e web
+npm run build:api     # compila a API
+npm run test:e2e      # E2E no Chromium
+npm run test:ci       # executa a sequência completa
+```
+
+Na primeira execução E2E local, instale o navegador:
+
+```bash
+cd web
+npx playwright install chromium
+```
+
+O workflow [.github/workflows/ci.yml](.github/workflows/ci.yml) executa verificações em pull requests e em pushes para `main`/`master`. Relatórios do Playwright são anexados quando houver falhas.
+
+As capturas de tela do README podem ser atualizadas com o teste de documentação:
+
+```powershell
+cd web
+$env:UPDATE_DOC_SCREENSHOTS = "1"
+npm run test:e2e -- --grep "capture documentation screenshots"
+Remove-Item Env:UPDATE_DOC_SCREENSHOTS
+```
+
+## Desenvolvimento
+
+Para executar os testes, são necessárias dependências instaladas nos diretórios `api` e `web`. Para iniciar os serviços sem Docker, use Docker para banco/MinIO e rode API e web em terminais separados:
+
+```bash
+# Terminal 1: banco e armazenamento
+docker compose up -d db minio minio-init
+
+# Terminal 2: API
+cd api
+npm ci
 npm run dev
 
-# Terminal 3: Start Web
+# Terminal 3: web
 cd web
-npm install
+npm ci
 npm run dev
 ```
 
-### Tests
+Os scripts de desenvolvimento usam por padrão `localhost` para os serviços; ajuste `DATABASE_URL`, endpoints do MinIO e variáveis de proxy conforme o ambiente.
+
+| Comando | Ação |
+|---|---|
+| `make start` | Inicia a stack Docker em segundo plano e compila imagens |
+| `make stop` | Para serviços e preserva volumes |
+| `make restart` | Reinicia os serviços |
+| `make status` | Mostra estado dos contêineres |
+| `make logs` | Acompanha logs |
+| `make tunnel` | Cria túnel HTTPS de desenvolvimento para acesso móvel |
+| `make destroy` | Remove serviços, volumes e imagens; **apaga os dados** |
+
+Geração manual de conteúdo para demonstração continua disponível:
 
 ```bash
-# API: vitest + supertest
-cd api
-npm test            # one-shot
-npm run test:watch  # watch mode
-npm run test:coverage
-
-# Web: vitest + React Testing Library
-cd web
-npm test
-npm run test:watch
-npm run test:coverage
-```
-
-### Seeding Lessons Manually (Optional)
-
-The app no longer auto-seeds. The catalogue is built by you via the Content Producer tab. If you want to bulk-populate the catalogue (e.g. for a demo), the script is still available:
-
-```bash
-# Via Docker
 docker compose run --rm api npm run seed-lessons
-
-# Locally
-cd api
-npm run seed-lessons
 ```
 
-The script generates 20 lessons per level (60 total) using the same `lesson-generator.ts` primitives the interactive flow uses.
+## Estrutura do repositório
 
-## Contributing
+```text
+.
+├── .github/workflows/ci.yml     # CI no GitHub Actions
+├── api/
+│   ├── src/agents/              # Produtor, gerador e tutor de fala
+│   ├── src/lib/                 # Banco, IA, armazenamento, SSE e fila
+│   ├── src/routes/              # Endpoints Express
+│   ├── src/app.ts               # Montagem testável da aplicação Express
+│   └── src/*.spec.ts            # Testes unitários e de integração
+├── db/                          # Inicialização PostgreSQL
+├── docs/screenshots/            # Capturas usadas nesta documentação
+├── installer/                   # Receita do Inno Setup
+├── scripts/                     # Scripts utilitários, incluindo instalador
+├── web/
+│   ├── src/app/                 # Páginas Next.js
+│   ├── src/components/          # Componentes de interface
+│   ├── src/lib/                 # Cliente API e exportação PDF
+│   └── e2e/                     # Testes Playwright e API simulada
+├── docker-compose.yml
+├── README.md                    # Documentação em português
+└── README.en.md                 # English documentation
+```
 
-Contributions are welcome! Please open an issue or submit a pull request.
+## Solução de problemas
+
+- **A aplicação não abre:** execute `docker compose ps` e `docker compose logs -f`; confirme se as portas `3000`, `3001`, `5432` e `9000` estão livres.
+- **Erro de banco ou serviço indisponível:** consulte `http://localhost:3001/health/ready` e aguarde os health checks dos contêineres.
+- **OpenAI não funciona:** confira se `OPENAI_API_KEY` contém uma chave válida e recrie o serviço API após atualizar o `.env`.
+- **Ollama não aparece como disponível:** confirme modelo baixado, endereço acessível de dentro do Docker e respostas dos endpoints STT e TTS.
+- **Microfone bloqueado no celular:** use HTTPS; HTTP com IP local normalmente não é um contexto seguro para captura de áudio.
+- **E2E falha por navegador ausente:** execute `cd web && npx playwright install chromium`.
+- **É necessário recomeçar o banco:** `docker compose down -v` remove os volumes locais e todos os dados persistidos.
+
+## Documentação adicional
+
+- [Referência da API](docs/API.md)
+- [Guia do Content Producer](docs/GUIDES/content-producer.md)
+- [English README](README.en.md)
+
+## Créditos e origem
+
+Este projeto é um fork do [Cariockko original](https://github.com/araujgom/cariockko), criado por [araujgom](https://github.com/araujgom). Agradecemos ao autor por disponibilizar o projeto original como código aberto, que serviu de base para este trabalho.

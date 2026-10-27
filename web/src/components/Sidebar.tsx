@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, BookOpen, Sparkles, Settings } from "lucide-react";
+import { LayoutGrid, BookOpen, Sparkles, Settings, GraduationCap } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -32,80 +33,69 @@ export function Sidebar() {
       active: isActive("/create-lessons"),
     },
     {
-      href: "#",
+      href: "/settings",
       icon: Settings,
       label: "Ajustes",
-      active: false,
-      disabled: true,
+      active: isActive("/settings"),
     },
   ];
 
   return (
     <>
-      {/* Desktop: vertical left rail (md and up) */}
-      <aside className="hidden md:flex w-16 bg-black flex-col items-center py-8 gap-8 shrink-0 min-h-screen">
-        <Link href="/" className="text-[#FAFAFA] font-sora font-bold text-base">
-          C
+      <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-slate-200/80 bg-white px-5 py-7">
+        <Link href="/" className="mb-10 flex items-center gap-3 px-2">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-200">
+            <GraduationCap size={22} />
+          </span>
+          <span>
+            <span className="block font-sora text-[15px] font-bold tracking-tight text-slate-900">Cariockko</span>
+            <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.16em] text-slate-400">English practice</span>
+          </span>
         </Link>
+        <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Menu principal</p>
         <nav className="flex flex-col gap-1">
-          {navItems.map(({ href, icon: Icon, label, active, disabled }) =>
-            disabled ? (
-              <span
-                key={label}
-                aria-disabled
-                aria-label={`${label} (em breve)`}
-                className="p-1.5 flex items-center justify-center text-[#3a3a3a] cursor-not-allowed"
-              >
-                <Icon size={18} />
-              </span>
-            ) : (
-              <Link
-                key={label}
-                href={href}
-                aria-label={label}
-                className={`p-1.5 flex items-center justify-center ${
-                  active ? "text-[#FAFAFA]" : "text-[#666666] hover:text-[#FAFAFA]"
-                }`}
-              >
-                <Icon size={18} />
-              </Link>
-            )
-          )}
-        </nav>
-      </aside>
-
-      {/* Mobile: fixed bottom tab bar (below md) */}
-      <nav
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-black border-t border-[#222] flex justify-around items-stretch pb-safe"
-        aria-label="Navegação principal"
-      >
-        {navItems.map(({ href, icon: Icon, label, active, disabled }) =>
-          disabled ? (
-            <span
-              key={label}
-              aria-disabled
-              aria-label={`${label} (em breve)`}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] text-[#3a3a3a] ${
-                active ? "text-[#FAFAFA]" : "text-[#666666]"
-              }`}
-            >
-              <Icon size={20} />
-              <span className="font-mono text-[10px] tracking-[1px]">{label}</span>
-            </span>
-          ) : (
+          {navItems.map(({ href, icon: Icon, label, active }) => (
             <Link
               key={label}
               href={href}
               aria-label={label}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] ${
-                active ? "text-[#FAFAFA]" : "text-[#666666]"
+              className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors ${
+                active ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
-              <Icon size={20} />
-              <span className="font-mono text-[10px] tracking-[1px]">{label}</span>
+              <Icon size={19} strokeWidth={1.8} />
+              {label}
             </Link>
-          )
-        )}
+          ))}
+        </nav>
+        <ThemeToggle />
+        <div className="mt-auto rounded-2xl bg-slate-50 p-4">
+          <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white text-indigo-600 shadow-sm">
+            <Sparkles size={16} />
+          </div>
+          <p className="text-xs font-semibold text-slate-800">Pratique um pouco todo dia</p>
+          <p className="mt-1 text-[11px] leading-5 text-slate-500">Pequenos passos constroem confiança para conversar.</p>
+        </div>
+      </aside>
+
+      <nav
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 flex items-stretch justify-around border-t border-slate-200 bg-white/95 pb-safe shadow-[0_-8px_24px_rgba(27,39,68,0.06)] backdrop-blur"
+        aria-label="Navegação principal"
+      >
+        {navItems.map(({ href, icon: Icon, label, active }) => (
+          <Link
+            key={label}
+            href={href}
+            aria-label={label}
+            className={`flex min-h-[58px] flex-1 flex-col items-center justify-center gap-1 py-2 ${
+              active ? "text-indigo-700" : "text-slate-400"
+            }`}
+          >
+            <Icon size={19} strokeWidth={1.9} />
+            <span className="font-sora text-[10px] font-medium">{label}</span>
+          </Link>
+        ))}
+        <ThemeToggle mobile />
       </nav>
     </>
   );
