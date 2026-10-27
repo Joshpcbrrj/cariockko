@@ -118,6 +118,12 @@ Os arquivos envolvidos:
 
 O comando de instalação baixa sempre a **última release publicada**, não o código mais recente do `main`. Uma release é criada ao enviar uma tag de versão (por exemplo `v0.2.0`): o workflow `.github/workflows/release.yml` roda todos os testes e só publica se eles passarem.
 
+### Ajustes no Docker Compose
+
+- **Imagens do MinIO:** a MinIO deixou de publicar as imagens `minio/minio` e `minio/mc`, então o `docker compose up` do original falha em máquinas que ainda não têm essas imagens. Este fork usa `pgsty/minio` e `pgsty/mc`, compiladas a partir do mesmo código aberto, com versões fixas.
+- **Porta do banco:** o PostgreSQL agora fica acessível só por `localhost` (antes ficava exposto para a rede local), e a porta é configurável por `POSTGRES_HOST_PORT`. O instalador escolhe outra porta se a 5432 já estiver ocupada, por exemplo por um PostgreSQL instalado na máquina.
+- **Valores padrão** para as variáveis que não são senhas, para que um `.env` incompleto não quebre a inicialização.
+
 ## 7. Testes e integração contínua
 
 - **API:** o app Express foi extraído para `createApp()` (`api/src/app.ts`), o que permitiu testes de integração das rotas com `supertest`, além de testes para a rota de configurações.

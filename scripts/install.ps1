@@ -139,8 +139,12 @@ function Install-Cariockko {
   }
 
   $setup = Join-Path $installDir "scripts\install-windows.ps1"
+  # Docker reports progress on stderr, which "Stop" would turn into an error when output is redirected.
+  $ErrorActionPreference = "Continue"
   & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File $setup
-  if ($LASTEXITCODE -ne 0) {
+  $exitCode = $LASTEXITCODE
+  $ErrorActionPreference = "Stop"
+  if ($exitCode -ne 0) {
     throw (Text 'A configura\u00e7\u00e3o do Cariockko n\u00e3o foi conclu\u00edda. Revise as mensagens acima.')
   }
   Write-Host ""

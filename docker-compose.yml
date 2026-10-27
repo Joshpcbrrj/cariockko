@@ -80,10 +80,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      # Only for tools on this machine; the API reaches the database through the Docker network.
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
 
   minio:
-    image: minio/minio:latest
+    # MinIO no longer publishes images; pgsty builds the same open-source code.
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
     container_name: cariockko-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
@@ -102,7 +104,7 @@ services:
       retries: 10
 
   minio-init:
-    image: minio/mc:latest
+    image: pgsty/mc:RELEASE.2026-09-16T00-00-00Z
     container_name: cariockko-minio-init
     depends_on:
       minio:

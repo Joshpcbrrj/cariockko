@@ -18,7 +18,8 @@ ENV API_INTERNAL_URL=${API_INTERNAL_URL}
 ENV MINIO_INTERNAL_URL=${MINIO_INTERNAL_URL}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
+# The repository has no public/ folder yet; the runner stage copies it.
+RUN mkdir -p public && npm run build
 
 FROM base AS runner
 WORKDIR /app

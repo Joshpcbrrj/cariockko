@@ -98,8 +98,31 @@ if (-not (Test-Docker @("info"))) {
   throw "O Docker Desktop está instalado, mas não está iniciado. Abra-o e tente novamente."
 }
 
+function Test-PortInUse([int]$Port) {
+  $client = New-Object System.Net.Sockets.TcpClient
+  try {
+    $client.Connect("127.0.0.1", $Port)
+    return $true
+  } catch {
+    return $false
+  } finally {
+    $client.Dispose()
+  }
+}
+
 if (-not (Test-Path $EnvPath)) {
   Copy-Item (Join-Path $ProjectRoot ".env.example") $EnvPath
+
+  # A PostgreSQL already installed on the machine usually holds port 5432.
+  $dbPort = 5432
+  while (Test-PortInUse $dbPort) {
+    $dbPort++
+    if ($dbPort -gt 5499) { throw "Nenhuma porta livre entre 5432 e 5499 para o banco de dados." }
+  }
+  Set-EnvValue "POSTGRES_HOST_PORT" "$dbPort"
+  if ($dbPort -ne 5432) {
+    Write-Warning "A porta 5432 já está em uso; o banco do Cariockko usará a porta $dbPort nesta máquina."
+  }
 
   # Data from an earlier installation was created with the example passwords.
   $projectName = (Split-Path -Leaf $ProjectRoot).ToLowerInvariant() -replace "[^a-z0-9_-]", ""

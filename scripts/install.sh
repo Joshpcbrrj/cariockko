@@ -163,6 +163,23 @@ install_files() {
   ok "Cariockko $version baixado"
 }
 
+port_in_use() {
+  (: < "/dev/tcp/127.0.0.1/$1") 2>/dev/null
+}
+
+# A PostgreSQL already installed on the machine usually holds port 5432.
+choose_db_port() {
+  local port=5432
+  while port_in_use "$port"; do
+    port=$((port + 1))
+    [ "$port" -le 5499 ] || fail "Nenhuma porta livre entre 5432 e 5499 para o banco de dados."
+  done
+  env_set POSTGRES_HOST_PORT "$port"
+  if [ "$port" != "5432" ]; then
+    warn "A porta 5432 já está em uso; o banco do Cariockko usará a porta $port nesta máquina."
+  fi
+}
+
 create_env() {
   local env_file="$INSTALL_DIR/.env"
   if [ -f "$env_file" ]; then
@@ -172,6 +189,7 @@ create_env() {
 
   cp "$INSTALL_DIR/.env.example" "$env_file"
   chmod 600 "$env_file"
+  choose_db_port
 
   # Data from an earlier installation was created with the example passwords.
   if docker volume inspect "$(project_name)_pgdata" > /dev/null 2>&1; then

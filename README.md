@@ -375,6 +375,7 @@ As configurações de desenvolvimento estão documentadas em [.env.example](.env
 | `LOCAL_TTS_MODEL` | `kokoro` | Modelo local de TTS |
 | `LOCAL_TTS_VOICE` | `af_heart` | Voz local |
 | `POSTGRES_DB` / `POSTGRES_PASSWORD` | `postgres` / `local-dev-password` | Banco da aplicação (o instalador gera uma senha aleatória) |
+| `POSTGRES_HOST_PORT` | `5432` | Porta do banco nesta máquina, acessível só por `localhost` (o instalador escolhe outra se a 5432 estiver ocupada) |
 | `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` | `minioadmin` | Credenciais do MinIO (o instalador gera uma senha aleatória) |
 | `MINIO_BUCKET` | `audio` | Bucket usado para áudio |
 | `GEN_CONCURRENCY` | `3` | Concorrência de geração |
