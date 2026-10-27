@@ -118,11 +118,20 @@ Os arquivos envolvidos:
 
 O comando de instalação baixa sempre a **última release publicada**, não o código mais recente do `main`. Uma release é criada ao enviar uma tag de versão (por exemplo `v0.2.0`): o workflow `.github/workflows/release.yml` roda todos os testes e só publica se eles passarem.
 
-### Ajustes no Docker Compose
+### Correções para instalar do zero
 
-- **Imagens do MinIO:** a MinIO deixou de publicar as imagens `minio/minio` e `minio/mc`, então o `docker compose up` do original falha em máquinas que ainda não têm essas imagens. Este fork usa `pgsty/minio` e `pgsty/mc`, compiladas a partir do mesmo código aberto, com versões fixas.
+No original, um `docker compose up` numa máquina nova falhava por três motivos, todos corrigidos aqui:
+
+- **Imagens do MinIO:** a MinIO deixou de publicar as imagens `minio/minio` e `minio/mc`. Este fork usa `pgsty/minio` e `pgsty/mc`, compiladas a partir do mesmo código aberto, com versões fixas.
+- **Pasta `web/public`:** o `Dockerfile` do site copiava essa pasta, que não existe no repositório. Agora ela é criada durante o build.
+- **Inicialização do banco:** o `init.sql` rodava duas vezes na primeira subida (diretamente e pelo `init.sh`), e a segunda execução falhava ao recriar os índices. Agora todos os comandos usam `IF NOT EXISTS`.
+
+Outros ajustes:
+
 - **Porta do banco:** o PostgreSQL agora fica acessível só por `localhost` (antes ficava exposto para a rede local), e a porta é configurável por `POSTGRES_HOST_PORT`. O instalador escolhe outra porta se a 5432 já estiver ocupada, por exemplo por um PostgreSQL instalado na máquina.
 - **Valores padrão** para as variáveis que não são senhas, para que um `.env` incompleto não quebre a inicialização.
+- **`GEN_CONCURRENCY`** agora chega de fato à API no Docker.
+- **Desenvolvimento local:** o `npm run dev` da API carrega o arquivo `api/.env`.
 
 ## 7. Testes e integração contínua
 

@@ -18,6 +18,7 @@
 - [Como funciona](#como-funciona)
 - [Arquitetura](#arquitetura)
 - [API](#api)
+- [Configuração](#configuração)
 - [Testes e integração contínua](#testes-e-integração-contínua)
 - [Desenvolvimento](#desenvolvimento)
 - [Estrutura do repositório](#estrutura-do-repositório)
@@ -210,6 +211,8 @@ O banco começa sem lições. Abra **Criar** para gerar as primeiras lições. A
 
 ### Parar e verificar
 
+Execute os comandos na pasta do projeto (ou na pasta de instalação, se você usou o instalador):
+
 ```bash
 docker compose ps
 docker compose logs -f
@@ -232,7 +235,9 @@ O provedor é selecionado na tela **Ajustes** e vale para toda a instalação do
 
 ### OpenAI na nuvem
 
-Defina uma chave real no `.env`:
+Se você usou o instalador e ainda não informou a chave, execute o comando de instalação novamente: enquanto a chave não estiver configurada, ele a solicita.
+
+Para definir ou trocar a chave manualmente, edite o `.env` (na pasta de instalação, se você usou o instalador):
 
 ```dotenv
 AI_PROVIDER=openai
@@ -240,10 +245,10 @@ OPENAI_API_KEY=sua-chave
 OPENAI_MODEL_CHAT=gpt-4o-mini
 ```
 
-Reinicie ou recrie a API após alterar variáveis:
+Depois, na mesma pasta, recrie a API para que ela leia o novo valor:
 
 ```bash
-docker compose up -d --build api
+docker compose up -d api
 ```
 
 O provedor OpenAI requer internet e uma chave válida. A chave é usada no backend e não deve ser colocada no código do navegador nem compartilhada.
@@ -378,7 +383,9 @@ As configurações de desenvolvimento estão documentadas em [.env.example](.env
 | `POSTGRES_HOST_PORT` | `5432` | Porta do banco nesta máquina, acessível só por `localhost` (o instalador escolhe outra se a 5432 estiver ocupada) |
 | `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` | `minioadmin` | Credenciais do MinIO (o instalador gera uma senha aleatória) |
 | `MINIO_BUCKET` | `audio` | Bucket usado para áudio |
-| `GEN_CONCURRENCY` | `3` | Concorrência de geração |
+| `GEN_CONCURRENCY` | `3` | Quantas lições são geradas em paralelo |
+
+Depois de alterar o `.env`, execute `docker compose up -d` na mesma pasta para aplicar as mudanças.
 
 Não publique o `.env` nem credenciais reais. Os valores do `.env.example` são apenas para desenvolvimento local.
 
@@ -440,24 +447,40 @@ Remove-Item Env:UPDATE_DOC_SCREENSHOTS
 
 ## Desenvolvimento
 
-Para executar os testes, são necessárias dependências instaladas nos diretórios `api` e `web`. Para iniciar os serviços sem Docker, use Docker para banco/MinIO e rode API e web em terminais separados:
+Para desenvolver com recarregamento automático, rode o banco e o MinIO no Docker e a API e o site direto no Node.js (22.9 ou mais recente), em terminais separados.
 
-```bash
-# Terminal 1: banco e armazenamento
-docker compose up -d db minio minio-init
+1. Crie o `.env` da raiz a partir do `.env.example` (veja a [instalação manual](#instalação-manual)) e suba o banco e o armazenamento:
 
-# Terminal 2: API
-cd api
-npm ci
-npm run dev
+   ```bash
+   docker compose up -d db minio minio-init
+   ```
 
-# Terminal 3: web
-cd web
-npm ci
-npm run dev
-```
+2. Crie o arquivo `api/.env`, que o `npm run dev` da API carrega. Use as senhas e a porta do `.env` da raiz, trocando os nomes dos serviços Docker por `localhost`:
 
-Os scripts de desenvolvimento usam por padrão `localhost` para os serviços; ajuste `DATABASE_URL`, endpoints do MinIO e variáveis de proxy conforme o ambiente.
+   ```dotenv
+   DATABASE_URL=postgresql://postgres:local-dev-password@localhost:5432/postgres
+   MINIO_ROOT_USER=minioadmin
+   MINIO_ROOT_PASSWORD=minioadmin
+   OPENAI_API_KEY=sua-chave
+   ```
+
+   Se `POSTGRES_HOST_PORT` não for `5432`, use a mesma porta no `DATABASE_URL`. Para a IA local, acrescente as variáveis `OLLAMA_*` e `LOCAL_*` com endereços `localhost`.
+
+3. Inicie a API e o site:
+
+   ```bash
+   # Terminal 2: API (porta 3001)
+   cd api
+   npm ci
+   npm run dev
+
+   # Terminal 3: site (porta 3000)
+   cd web
+   npm ci
+   npm run dev
+   ```
+
+O site em desenvolvimento encaminha `/api` e `/audio` para `localhost:3001` e `localhost:9000` sem configuração extra.
 
 | Comando | Ação |
 |---|---|
@@ -502,7 +525,8 @@ docker compose run --rm api npm run seed-lessons
 
 ## Solução de problemas
 
-- **A aplicação não abre:** execute `docker compose ps` e `docker compose logs -f`; confirme se as portas `3000`, `3001`, `5432` e `9000` estão livres.
+- **A aplicação não abre:** na pasta do projeto ou de instalação, execute `docker compose ps` e `docker compose logs -f`; confirme se as portas `3000`, `3001`, `9000` e `9001` estão livres. A porta do banco pode ser trocada com `POSTGRES_HOST_PORT`.
+- **Ajustes mostra "OpenAI não configurada":** execute o comando de instalação novamente para informar a chave, ou edite o `.env` como em [OpenAI na nuvem](#openai-na-nuvem).
 - **Erro de banco ou serviço indisponível:** consulte `http://localhost:3001/health/ready` e aguarde os health checks dos contêineres.
 - **OpenAI não funciona:** confira se `OPENAI_API_KEY` contém uma chave válida e recrie o serviço API após atualizar o `.env`.
 - **Ollama não aparece como disponível:** confirme modelo baixado, endereço acessível de dentro do Docker e respostas dos endpoints STT e TTS.

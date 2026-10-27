@@ -45,6 +45,7 @@ services:
       - LOCAL_TTS_BASE_URL=${LOCAL_TTS_BASE_URL:-http://host.docker.internal:8880/v1}
       - LOCAL_TTS_MODEL=${LOCAL_TTS_MODEL:-kokoro}
       - LOCAL_TTS_VOICE=${LOCAL_TTS_VOICE:-af_heart}
+      - GEN_CONCURRENCY=${GEN_CONCURRENCY:-3}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

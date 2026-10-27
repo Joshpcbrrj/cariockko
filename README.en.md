@@ -18,11 +18,13 @@
 - [How it works](#how-it-works)
 - [Architecture](#architecture)
 - [API](#api)
+- [Configuration](#configuration)
 - [Tests and continuous integration](#tests-and-continuous-integration)
 - [Development](#development)
 - [Repository structure](#repository-structure)
 - [Troubleshooting](#troubleshooting)
 - [Credits and origin](#credits-and-origin)
+- [Differences from the original](#differences-from-the-original)
 
 ## What is Cariockko?
 
@@ -209,6 +211,8 @@ The database starts without lessons. Open **Create** to generate your first less
 
 ### Stop and check services
 
+Run these commands in the project folder (or in the installation folder, if you used the installer):
+
 ```bash
 docker compose ps
 docker compose logs -f
@@ -231,7 +235,9 @@ Select the provider on the **Settings** page. The selection applies to the whole
 
 ### OpenAI cloud
 
-Set a real key in `.env`:
+If you used the installer and have not entered a key yet, run the install command again: it asks for the key while none is configured.
+
+To set or change the key manually, edit `.env` (in the installation folder, if you used the installer):
 
 ```dotenv
 AI_PROVIDER=openai
@@ -239,10 +245,10 @@ OPENAI_API_KEY=your-key
 OPENAI_MODEL_CHAT=gpt-4o-mini
 ```
 
-Recreate the API service after changing environment variables:
+Then, in the same folder, recreate the API so it reads the new value:
 
 ```bash
-docker compose up -d --build api
+docker compose up -d api
 ```
 
 OpenAI requires internet access and a valid key. The key is used by the backend; do not put it in browser code or share it.
@@ -357,6 +363,32 @@ The web app uses the Express API. Key routes:
 
 See [docs/API.md](docs/API.md) for request and response details.
 
+## Configuration
+
+Settings are documented in [.env.example](.env.example). Main variables:
+
+| Variable | Default / example | Description |
+|---|---|---|
+| `AI_PROVIDER` | `openai` | Initial provider: `openai` or `ollama` |
+| `OPENAI_API_KEY` | — | OpenAI key; required for cloud mode |
+| `OPENAI_MODEL_CHAT` | `gpt-4o-mini` | OpenAI chat model |
+| `OLLAMA_BASE_URL` | `http://host.docker.internal:11434` | Ollama address |
+| `OLLAMA_MODEL` | `llama3.1` | Installed local model |
+| `LOCAL_STT_BASE_URL` | `http://host.docker.internal:8000/v1` | Local transcription endpoint |
+| `LOCAL_STT_MODEL` | `Systran/faster-whisper-small` | Local STT model |
+| `LOCAL_TTS_BASE_URL` | `http://host.docker.internal:8880/v1` | Local speech endpoint |
+| `LOCAL_TTS_MODEL` | `kokoro` | Local TTS model |
+| `LOCAL_TTS_VOICE` | `af_heart` | Local voice |
+| `POSTGRES_DB` / `POSTGRES_PASSWORD` | `postgres` / `local-dev-password` | Application database (the installer generates a random password) |
+| `POSTGRES_HOST_PORT` | `5432` | Database port on this machine, reachable only from `localhost` (the installer picks another one if 5432 is taken) |
+| `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` | `minioadmin` | MinIO credentials (the installer generates a random password) |
+| `MINIO_BUCKET` | `audio` | Bucket used for audio |
+| `GEN_CONCURRENCY` | `3` | How many lessons are generated in parallel |
+
+After changing `.env`, run `docker compose up -d` in the same folder to apply the changes.
+
+Do not publish `.env` or real credentials. The `.env.example` values are for local development only.
+
 ## Tests and continuous integration
 
 Tests live alongside the code. The suites include unit tests, API integration tests with Supertest, and UI tests with Vitest/Testing Library. Playwright E2E tests use a mock API and do not require Docker, a database, or AI credentials.
@@ -415,24 +447,40 @@ Remove-Item Env:UPDATE_DOC_SCREENSHOTS
 
 ## Development
 
-Install dependencies in `api` and `web` to run the test suites. To run the app without Docker, use Docker for PostgreSQL/MinIO and start the API and web in separate terminals:
+For development with automatic reloading, run the database and MinIO in Docker and the API and web app directly on Node.js (22.9 or newer), in separate terminals.
 
-```bash
-# Terminal 1: database and storage
-docker compose up -d db minio minio-init
+1. Create the root `.env` from `.env.example` (see [manual installation](#manual-installation)) and start the database and storage:
 
-# Terminal 2: API
-cd api
-npm ci
-npm run dev
+   ```bash
+   docker compose up -d db minio minio-init
+   ```
 
-# Terminal 3: web
-cd web
-npm ci
-npm run dev
-```
+2. Create `api/.env`, which the API's `npm run dev` loads. Use the passwords and port from the root `.env`, replacing Docker service names with `localhost`:
 
-Development scripts use `localhost` for services by default; adjust `DATABASE_URL`, MinIO endpoints, and proxy environment variables for your setup.
+   ```dotenv
+   DATABASE_URL=postgresql://postgres:local-dev-password@localhost:5432/postgres
+   MINIO_ROOT_USER=minioadmin
+   MINIO_ROOT_PASSWORD=minioadmin
+   OPENAI_API_KEY=your-key
+   ```
+
+   If `POSTGRES_HOST_PORT` is not `5432`, use the same port in `DATABASE_URL`. For local AI, add the `OLLAMA_*` and `LOCAL_*` variables with `localhost` addresses.
+
+3. Start the API and the web app:
+
+   ```bash
+   # Terminal 2: API (port 3001)
+   cd api
+   npm ci
+   npm run dev
+
+   # Terminal 3: web app (port 3000)
+   cd web
+   npm ci
+   npm run dev
+   ```
+
+In development, the web app forwards `/api` and `/audio` to `localhost:3001` and `localhost:9000` with no extra configuration.
 
 | Command | Action |
 |---|---|
@@ -477,7 +525,8 @@ docker compose run --rm api npm run seed-lessons
 
 ## Troubleshooting
 
-- **The app does not open:** run `docker compose ps` and `docker compose logs -f`; check whether ports `3000`, `3001`, `5432`, and `9000` are available.
+- **The app does not open:** in the project or installation folder, run `docker compose ps` and `docker compose logs -f`; check whether ports `3000`, `3001`, `9000`, and `9001` are available. The database port can be changed with `POSTGRES_HOST_PORT`.
+- **Settings shows "OpenAI not configured":** run the install command again to enter the key, or edit `.env` as described in [OpenAI cloud](#openai-cloud).
 - **Database or service unavailable:** check `http://localhost:3001/health/ready` and wait for container health checks.
 - **OpenAI is not working:** verify that `OPENAI_API_KEY` is valid and recreate the API service after changing `.env`.
 - **Ollama is unavailable:** check the downloaded model, Docker-reachable Ollama address, and STT/TTS endpoints.
