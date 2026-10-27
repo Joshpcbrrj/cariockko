@@ -257,27 +257,27 @@ O provedor OpenAI requer internet e uma chave válida. A chave é usada no backe
 
 A chave da API é paga por uso e é cobrada separadamente da assinatura do ChatGPT: ter o ChatGPT Plus ou Pro **não** dá acesso à API.
 
-> As imagens abaixo são ilustrações simplificadas. A tela real do site da OpenAI pode ter outro visual, mas os endereços e os nomes dos botões são os mesmos.
+**1. Acesse a plataforma da API.** Em [openai.com](https://openai.com), clique em **Log in** e escolha **API Platform**. Outra opção é ir direto para [platform.openai.com](https://platform.openai.com).
 
-**1. Crie uma conta** em [platform.openai.com/signup](https://platform.openai.com/signup) e confirme o e-mail. Se você já usa o ChatGPT, pode entrar com a mesma conta. A OpenAI pode pedir a confirmação de um número de celular.
+<img src="docs/images/openai-key/01-entrar.png" alt="Menu Log in do site da OpenAI com a opção API Platform" width="600">
 
-![Ilustração: tela de criação de conta da OpenAI](docs/images/openai-key/01-conta.svg)
+**2. Entre ou crie a sua conta** com e-mail, Google, Apple, Microsoft ou telefone. Se você já usa o ChatGPT, pode entrar com a mesma conta.
 
-**2. Adicione créditos** em [Billing](https://platform.openai.com/settings/organization/billing/overview): clique em **Add to credit balance** e informe um cartão de crédito. O valor mínimo é US$ 5. Sem créditos, a chave existe, mas não funciona.
+<img src="docs/images/openai-key/02-login.png" alt="Tela de login da OpenAI Platform" width="600">
 
-![Ilustração: página Billing com o botão Add to credit balance](docs/images/openai-key/02-creditos.svg)
+**3. Adicione créditos e abra API Keys.** No painel inicial, use **Add credits** (ou **Go to Billing**, no canto inferior esquerdo) para comprar créditos com cartão de crédito; o valor mínimo é US$ 5. Sem créditos, a chave existe, mas não funciona. Depois, clique em **API Keys** no menu lateral.
 
-**3. Crie a chave** em [API keys](https://platform.openai.com/api-keys): clique em **Create new secret key**, dê um nome (por exemplo, `Cariockko`), mantenha o projeto padrão e clique em **Create secret key**.
+<img src="docs/images/openai-key/03-painel.png" alt="Painel da OpenAI Platform com o item API Keys no menu lateral" width="600">
 
-![Ilustração: página API keys com o botão Create new secret key](docs/images/openai-key/03-criar-chave.svg)
+**4. Crie a chave.** Clique em **Create new secret key**, dê um nome (por exemplo, `Cariockko`) e confirme. Se a janela oferecer uma data de expiração, escolha um prazo longo: quando a chave expira, o Cariockko deixa de conseguir usar a OpenAI.
 
-**4. Copie a chave** com o botão **Copy**. Ela começa com `sk-` e **só aparece uma vez**: se você fechar a janela sem copiar, apague essa chave e crie outra.
+<img src="docs/images/openai-key/04-api-keys.png" alt="Página API keys com o botão Create new secret key" width="600">
 
-![Ilustração: janela Save your key com o botão Copy](docs/images/openai-key/04-copiar-chave.svg)
+**5. Copie a chave** com o botão **Copy** da janela **Save your key**. Ela começa com `sk-proj-` e **só aparece uma vez**: se você fechar a janela sem copiar, apague essa chave e crie outra. Atenção: o botão de copiar que fica na tabela copia o *tracking ID*, que não é a chave.
 
-**5. Cole a chave no instalador.** Execute o [comando de instalação](#instalação-rápida) e cole a chave quando ele pedir. Nada aparece enquanto você cola, porque a chave fica oculta de propósito; basta teclar Enter. Se o Cariockko já estiver instalado, rodar o comando de novo também serve: ele pede a chave enquanto ela não estiver configurada.
+<img src="docs/images/openai-key/05-copiar-chave.png" alt="Janela Save your key com o botão Copy" width="600">
 
-![Ilustração: instalador do Cariockko pedindo a chave da OpenAI](docs/images/openai-key/05-instalador.svg)
+**6. Cole a chave no instalador.** Execute o [comando de instalação](#instalação-rápida) e cole a chave quando ele pedir. Nada aparece enquanto você cola, porque a chave fica oculta de propósito; basta teclar Enter. Se o Cariockko já estiver instalado, rodar o comando de novo também serve: ele pede a chave enquanto ela não estiver configurada. Para trocar uma chave que já está configurada, edite o `.env` como explicado acima.
 
 Pronto: abra **Ajustes** no Cariockko e confira que a OpenAI aparece como configurada.
 
@@ -544,7 +544,7 @@ docker compose run --rm api npm run seed-lessons
 │   ├── src/app.ts               # Montagem testável da aplicação Express
 │   └── src/*.spec.ts            # Testes unitários e de integração
 ├── db/                          # Inicialização PostgreSQL
-├── docs/images/                 # Ilustrações dos tutoriais
+├── docs/images/                 # Imagens dos tutoriais
 ├── docs/screenshots/            # Capturas usadas nesta documentação
 ├── installer/                   # Receita do Inno Setup
 ├── scripts/                     # Instaladores (Windows, macOS e Linux)

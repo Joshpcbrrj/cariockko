@@ -257,27 +257,27 @@ OpenAI requires internet access and a valid key. The key is used by the backend;
 
 API usage is pay-as-you-go and billed separately from ChatGPT: a ChatGPT Plus or Pro subscription does **not** include API access.
 
-> The images below are simplified illustrations, annotated in Portuguese. The real OpenAI site may look different, but the addresses and button names are the same.
+**1. Open the API platform.** On [openai.com](https://openai.com), click **Log in** and choose **API Platform**. You can also go straight to [platform.openai.com](https://platform.openai.com).
 
-**1. Create an account** at [platform.openai.com/signup](https://platform.openai.com/signup) and confirm your email. If you already use ChatGPT, you can sign in with the same account. OpenAI may ask you to verify a phone number.
+<img src="docs/images/openai-key/01-entrar.png" alt="OpenAI Log in menu with the API Platform option" width="600">
 
-![Illustration: OpenAI sign-up page](docs/images/openai-key/01-conta.svg)
+**2. Sign in or create your account** with email, Google, Apple, Microsoft, or phone. If you already use ChatGPT, you can sign in with the same account.
 
-**2. Add credits** in [Billing](https://platform.openai.com/settings/organization/billing/overview): click **Add to credit balance** and enter a credit card. The minimum is US$5. Without credits, the key exists but does not work.
+<img src="docs/images/openai-key/02-login.png" alt="OpenAI Platform sign-in page" width="600">
 
-![Illustration: Billing page with the Add to credit balance button](docs/images/openai-key/02-creditos.svg)
+**3. Add credits and open API Keys.** On the home dashboard, use **Add credits** (or **Go to Billing**, bottom left) to buy credits with a credit card; the minimum is US$5. Without credits, the key exists but does not work. Then click **API Keys** in the sidebar.
 
-**3. Create the key** in [API keys](https://platform.openai.com/api-keys): click **Create new secret key**, give it a name (for example, `Cariockko`), keep the default project, and click **Create secret key**.
+<img src="docs/images/openai-key/03-painel.png" alt="OpenAI Platform dashboard with API Keys in the sidebar" width="600">
 
-![Illustration: API keys page with the Create new secret key button](docs/images/openai-key/03-criar-chave.svg)
+**4. Create the key.** Click **Create new secret key**, give it a name (for example, `Cariockko`), and confirm. If the dialog offers an expiration date, choose a long one: when the key expires, Cariockko can no longer use OpenAI.
 
-**4. Copy the key** with the **Copy** button. It starts with `sk-` and is **shown only once**: if you close the window without copying it, delete that key and create another.
+<img src="docs/images/openai-key/04-api-keys.png" alt="API keys page with the Create new secret key button" width="600">
 
-![Illustration: Save your key dialog with the Copy button](docs/images/openai-key/04-copiar-chave.svg)
+**5. Copy the key** with the **Copy** button in the **Save your key** dialog. It starts with `sk-proj-` and is **shown only once**: if you close the dialog without copying it, delete that key and create another. Note: the copy button in the table copies the *tracking ID*, which is not the key.
 
-**5. Paste the key into the installer.** Run the [install command](#quick-start) and paste the key when asked. Nothing appears while you paste, because the key is hidden on purpose; just press Enter. If Cariockko is already installed, running the command again works too: it asks for the key while none is configured.
+<img src="docs/images/openai-key/05-copiar-chave.png" alt="Save your key dialog with the Copy button" width="600">
 
-![Illustration: Cariockko installer asking for the OpenAI key](docs/images/openai-key/05-instalador.svg)
+**6. Paste the key into the installer.** Run the [install command](#quick-start) and paste the key when asked. Nothing appears while you paste, because the key is hidden on purpose; just press Enter. If Cariockko is already installed, running the command again works too: it asks for the key while none is configured. To replace a key that is already configured, edit `.env` as described above.
 
 Done: open **Settings** in Cariockko and check that OpenAI shows as configured.
 
@@ -544,7 +544,7 @@ docker compose run --rm api npm run seed-lessons
 │   ├── src/app.ts               # Testable Express app composition
 │   └── src/*.spec.ts            # Unit and integration tests
 ├── db/                          # PostgreSQL initialization
-├── docs/images/                 # Tutorial illustrations
+├── docs/images/                 # Tutorial images
 ├── docs/screenshots/            # Images used by this documentation
 ├── installer/                   # Inno Setup recipe
 ├── scripts/                     # Installers (Windows, macOS, and Linux)
