@@ -76,6 +76,10 @@ jobs:
   install-script:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    defaults:
+      run:
+        # Explicit bash enables pipefail, so piping through tee keeps failures.
+        shell: bash
     env:
       CARIOCKKO_SOURCE_DIR: ${{ github.workspace }}
       CARIOCKKO_DIR: /tmp/cariockko
@@ -97,7 +101,7 @@ jobs:
           fi
 
       - name: Install with the script
-        run: bash scripts/install.sh < /dev/null
+        run: bash scripts/install.sh < /dev/null 2>&1 | tee /tmp/install.log
         env:
           OPENAI_API_KEY: sk-ci-placeholder
 
@@ -125,6 +129,17 @@ jobs:
           test ! -e "$CARIOCKKO_DIR"
           test -z "$(docker ps -q --filter name=cariockko)"
 
-      - name: Show container logs
+      # Annotations are readable without signing in, unlike the job logs.
+      - name: Report failure details
         if: failure()
-        run: cd "$CARIOCKKO_DIR" && docker compose logs --tail 200
+        run: |
+          {
+            echo "== installer output =="
+            tail -n 60 /tmp/install.log 2>/dev/null || true
+            echo "== containers =="
+            (cd "$CARIOCKKO_DIR" && docker compose ps -a) 2>&1 || true
+            echo "== container logs =="
+            (cd "$CARIOCKKO_DIR" && docker compose logs --no-color --tail 30) 2>&1 || true
+          } | tr -d '\r' | tail -c 30000 > /tmp/report.txt
+          cat /tmp/report.txt
+          echo "::error title=Installer failure::$(sed -e 's/%/%25/g' /tmp/report.txt | awk '{ printf "%s%%0A", $0 }')"
