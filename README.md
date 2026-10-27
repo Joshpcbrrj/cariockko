@@ -98,7 +98,7 @@ Alterne o tema pela opção **Tema** na navegação. A preferência fica salva n
 - Docker Desktop ou Docker Engine com Docker Compose v2.
 - Para o modo OpenAI: uma chave de API válida, com créditos, e acesso à internet ([como obter uma chave](#como-obter-uma-chave-da-openai)).
 - Para o modo local: Ollama com o modelo configurado, além de serviços locais compatíveis de transcrição de áudio (STT) e síntese de voz (TTS).
-- Para desenvolver/testar: Node.js 22 ou versão compatível com os projetos.
+- Para desenvolver/testar: Node.js 22.9 ou mais recente.
 
 ## Instalação rápida
 

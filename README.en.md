@@ -98,7 +98,7 @@ Switch themes with **Theme** in the navigation. The preference is saved in the b
 - Docker Desktop or Docker Engine with Docker Compose v2.
 - For cloud mode: a valid OpenAI API key with credits, and internet access ([how to get a key](#how-to-get-an-openai-api-key)).
 - For local mode: Ollama with the configured model, plus compatible local speech-to-text (STT) and text-to-speech (TTS) services.
-- For development/testing: Node.js 22 or a version compatible with the project packages.
+- For development/testing: Node.js 22.9 or newer.
 
 ## Quick start
 
