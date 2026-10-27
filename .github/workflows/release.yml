@@ -1,0 +1,36 @@
+name: Release
+
+# Publishes a GitHub release when a version tag (for example v0.2.0) is pushed.
+# The install scripts download the latest release, so a version only becomes
+# available to new installs after all checks pass here.
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            scripts/install.sh \
+            scripts/install.ps1 \
+            --title "Cariockko $GITHUB_REF_NAME" \
+            --generate-notes \
+            --verify-tag

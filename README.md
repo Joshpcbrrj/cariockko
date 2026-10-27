@@ -101,6 +101,79 @@ Alterne o tema pela opção **Tema** na navegação. A preferência fica salva n
 
 ## Instalação rápida
 
+Com o Docker instalado e aberto, um único comando baixa a última versão publicada, cria a configuração e abre o app no navegador.
+
+**Windows** (no PowerShell):
+
+```powershell
+irm https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.ps1 | iex
+```
+
+**macOS e Linux** (no Terminal):
+
+```bash
+curl -fsSL https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.sh | bash
+```
+
+O instalador:
+
+1. confere se o Docker está instalado e em execução;
+2. baixa a [última versão publicada](https://github.com/Joshpcbrrj/cariockko/releases/latest) do Cariockko;
+3. cria o `.env` com senhas aleatórias para o banco e o armazenamento;
+4. pede a chave da OpenAI sem exibi-la na tela. Se você pressionar Enter sem digitar nada, ele verifica se a [IA local](#ia-local-com-ollama) está pronta e usa esse modo;
+5. inicia os serviços e abre [http://localhost:3000](http://localhost:3000).
+
+| Sistema | Pasta de instalação |
+|---|---|
+| Windows | `%LOCALAPPDATA%\Programs\Cariockko` |
+| macOS e Linux | `~/cariockko` |
+
+**Atualizar:** execute o mesmo comando novamente. O código é substituído pela versão mais recente; o `.env` e os dados (lições, áudios e progresso) são mantidos.
+
+**Desinstalar:** o instalador pergunta se os dados também devem ser apagados.
+
+```powershell
+# Windows
+& ([scriptblock]::Create((irm https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.ps1))) -Uninstall
+```
+
+```bash
+# macOS e Linux
+curl -fsSL https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.sh | bash -s -- --uninstall
+```
+
+<details>
+<summary>Opções avançadas do instalador</summary>
+
+Defina estas variáveis de ambiente antes de executar o comando:
+
+| Variável | Efeito |
+|---|---|
+| `CARIOCKKO_DIR` | Instala em outra pasta |
+| `CARIOCKKO_VERSION` | Instala uma versão específica, por exemplo `v0.2.0` |
+| `OPENAI_API_KEY` | Usa esta chave sem perguntar |
+| `CARIOCKKO_AI_PROVIDER=ollama` | Escolhe a IA local sem perguntar |
+| `CARIOCKKO_DELETE_DATA=1` | Na desinstalação, apaga os dados sem perguntar (`0` mantém) |
+| `CARIOCKKO_NO_BROWSER=1` | Não abre o navegador ao final |
+
+Exemplo no macOS e Linux: `curl -fsSL .../install.sh | CARIOCKKO_DIR=~/apps/cariockko bash`. No Windows: `$env:CARIOCKKO_DIR = "D:\Apps\Cariockko"` antes do comando.
+
+</details>
+
+Prefere ler o script antes de executá-lo? Ele está em [scripts/install.sh](scripts/install.sh) e [scripts/install.ps1](scripts/install.ps1). Também é possível baixá-lo primeiro e executar depois:
+
+```bash
+curl -fsSLO https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.sh
+less install.sh
+bash install.sh
+```
+
+O instalador não inclui o Docker, o Ollama nem modelos de IA.
+
+### Instalação manual
+
+Para desenvolver ou instalar sem o script:
+
 1. Clone o repositório e entre na pasta:
 
    ```bash
@@ -119,6 +192,8 @@ Alterne o tema pela opção **Tema** na navegação. A preferência fica salva n
    ```powershell
    Copy-Item .env.example .env
    ```
+
+   Se o app ficar acessível a outras pessoas, troque `POSTGRES_PASSWORD` (e a senha dentro de `DATABASE_URL`) e `MINIO_ROOT_PASSWORD` antes de iniciar pela primeira vez.
 
 3. Configure o provedor desejado conforme a seção [Provedores de IA](#provedores-de-ia-nuvem-e-local).
 4. Inicie os serviços:
@@ -200,13 +275,17 @@ Baixe o modelo configurado no Ollama antes de usar, por exemplo:
 ollama pull llama3.1
 ```
 
+No Linux, o Ollama aceita por padrão apenas conexões da própria máquina, e o contêiner da API não consegue alcançá-lo. Defina `OLLAMA_HOST=0.0.0.0` no serviço do Ollama (por exemplo, com `sudo systemctl edit ollama`) e reinicie-o.
+
 Os endereços de exemplo pressupõem que os serviços de áudio aceitam as rotas compatíveis `/v1/models`, `/v1/audio/transcriptions` e `/v1/audio/speech`. Esses servidores e modelos locais **não estão incluídos** no Cariockko nem no instalador.
 
 Em **Ajustes**, o app verifica o modelo Ollama, o STT e o TTS e só habilita a seleção local quando todos responderem. É possível rodar as funções de IA sem enviar conteúdo à OpenAI nesse modo, mas é necessário instalar os modelos e serviços antes. O download inicial dos modelos depende de internet; depois disso, o processamento pode ocorrer localmente, desde que os serviços estejam ligados. Docker, banco de dados e MinIO também precisam estar em execução.
 
 ## Instalador do Windows
 
-O script [scripts/install-windows.ps1](scripts/install-windows.ps1) verifica o Docker Desktop, prepara o `.env`, solicita a chave OpenAI de forma protegida quando aplicável, executa `docker compose up -d --build` e abre o app no navegador.
+Além da [instalação rápida](#instalação-rápida), há um instalador `.exe` tradicional.
+
+O script [scripts/install-windows.ps1](scripts/install-windows.ps1) verifica o Docker Desktop, cria o `.env` com senhas aleatórias, solicita a chave OpenAI de forma protegida quando aplicável, executa `docker compose up -d --build` e abre o app no navegador. Ele é usado tanto pelo instalador `.exe` quanto pelo [scripts/install.ps1](scripts/install.ps1), que baixa a última versão publicada e o executa.
 
 O arquivo [installer/Cariockko.iss](installer/Cariockko.iss) é a receita do instalador `.exe` com atalhos para o Menu Iniciar e, opcionalmente, para a área de trabalho. Compile-a com o Inno Setup a partir da raiz do repositório. O executável compilado não é versionado; o instalador não inclui Docker Desktop, Ollama ou modelos de IA.
 
@@ -295,8 +374,8 @@ As configurações de desenvolvimento estão documentadas em [.env.example](.env
 | `LOCAL_TTS_BASE_URL` | `http://host.docker.internal:8880/v1` | Endpoint local de voz |
 | `LOCAL_TTS_MODEL` | `kokoro` | Modelo local de TTS |
 | `LOCAL_TTS_VOICE` | `af_heart` | Voz local |
-| `POSTGRES_DB` / `POSTGRES_PASSWORD` | `postgres` / `local-dev-password` | Banco da aplicação |
-| `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` | `minioadmin` | Credenciais do MinIO |
+| `POSTGRES_DB` / `POSTGRES_PASSWORD` | `postgres` / `local-dev-password` | Banco da aplicação (o instalador gera uma senha aleatória) |
+| `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` | `minioadmin` | Credenciais do MinIO (o instalador gera uma senha aleatória) |
 | `MINIO_BUCKET` | `audio` | Bucket usado para áudio |
 | `GEN_CONCURRENCY` | `3` | Concorrência de geração |
 
@@ -332,7 +411,22 @@ cd web
 npx playwright install chromium
 ```
 
-O workflow [.github/workflows/ci.yml](.github/workflows/ci.yml) executa verificações em pull requests e em pushes para `main`/`master`. Relatórios do Playwright são anexados quando houver falhas.
+O workflow [.github/workflows/ci.yml](.github/workflows/ci.yml) executa verificações em pull requests e em pushes para `main`/`master`. Relatórios do Playwright são anexados quando houver falhas. O mesmo workflow também testa o instalador de macOS e Linux de ponta a ponta: instala com Docker, verifica o app, atualiza e desinstala.
+
+### Publicar uma nova versão
+
+O comando de instalação sempre baixa a **última versão publicada**, não o código mais recente do `main`. Para publicar uma versão:
+
+1. Atualize `AppVersion` em [installer/Cariockko.iss](installer/Cariockko.iss) e `version` no [package.json](package.json) da raiz.
+2. Faça o commit e envie para o `main`.
+3. Crie e envie a tag da versão:
+
+   ```bash
+   git tag v0.3.0
+   git push origin v0.3.0
+   ```
+
+O workflow [.github/workflows/release.yml](.github/workflows/release.yml) roda todas as verificações e, se passarem, publica a release com notas geradas automaticamente e os instaladores anexados. Se alguma verificação falhar, nada é publicado e quem instala continua recebendo a versão anterior.
 
 As capturas de tela do README podem ser atualizadas com o teste de documentação:
 
@@ -384,7 +478,7 @@ docker compose run --rm api npm run seed-lessons
 
 ```text
 .
-├── .github/workflows/ci.yml     # CI no GitHub Actions
+├── .github/workflows/           # CI e publicação de releases no GitHub Actions
 ├── api/
 │   ├── src/agents/              # Produtor, gerador e tutor de fala
 │   ├── src/lib/                 # Banco, IA, armazenamento, SSE e fila
@@ -394,7 +488,7 @@ docker compose run --rm api npm run seed-lessons
 ├── db/                          # Inicialização PostgreSQL
 ├── docs/screenshots/            # Capturas usadas nesta documentação
 ├── installer/                   # Receita do Inno Setup
-├── scripts/                     # Scripts utilitários, incluindo instalador
+├── scripts/                     # Instaladores (Windows, macOS e Linux)
 ├── web/
 │   ├── src/app/                 # Páginas Next.js
 │   ├── src/components/          # Componentes de interface
@@ -427,6 +521,6 @@ Este projeto é um fork do [Cariockko original](https://github.com/araujgom/cari
 
 ## Diferenças em relação ao original
 
-Este fork acrescenta ao projeto original o uso de IA local com Ollama, uma página de ajustes, o modo escuro, um novo visual, a exportação de lições em PDF, um instalador para Windows, testes E2E com CI e documentação em inglês.
+Este fork acrescenta ao projeto original o uso de IA local com Ollama, uma página de ajustes, o modo escuro, um novo visual, a exportação de lições em PDF, a instalação com um comando no Windows, macOS e Linux, releases versionadas, testes E2E com CI e documentação em inglês.
 
 Veja o detalhamento completo em [DIFERENCAS.md](DIFERENCAS.md).

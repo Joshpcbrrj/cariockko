@@ -2,17 +2,33 @@
 
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 $EnvPath = Join-Path $ProjectRoot ".env"
+$Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+
+function Read-EnvFile {
+  return [System.IO.File]::ReadAllText($EnvPath, $Utf8NoBom)
+}
 
 function Set-EnvValue([string]$Name, [string]$Value) {
-  $content = Get-Content -Raw -Path $EnvPath
-  $pattern = "(?m)^$([regex]::Escape($Name))=.*$"
+  $content = Read-EnvFile
+  $pattern = "(?m)^$([regex]::Escape($Name))=[^\r\n]*"
   $line = "$Name=$Value"
   if ([regex]::IsMatch($content, $pattern)) {
     $content = [regex]::Replace($content, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($match) $line })
   } else {
     $content = $content.TrimEnd() + [Environment]::NewLine + $line + [Environment]::NewLine
   }
-  Set-Content -Path $EnvPath -Value $content -NoNewline
+  [System.IO.File]::WriteAllText($EnvPath, $content, $Utf8NoBom)
+}
+
+function New-Secret {
+  $bytes = New-Object byte[] 16
+  $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+  try {
+    $rng.GetBytes($bytes)
+  } finally {
+    $rng.Dispose()
+  }
+  return -join ($bytes | ForEach-Object { $_.ToString("x2") })
 }
 
 function Read-SecureText([string]$Prompt) {
@@ -35,8 +51,8 @@ function Test-Endpoint([string]$Url) {
 }
 
 function Get-EnvValue([string]$Name, [string]$DefaultValue) {
-  $content = Get-Content -Raw -Path $EnvPath
-  $match = [regex]::Match($content, "(?m)^$([regex]::Escape($Name))=(.*)$")
+  $content = Read-EnvFile
+  $match = [regex]::Match($content, "(?m)^$([regex]::Escape($Name))=([^\r\n]*)")
   if ($match.Success -and -not [string]::IsNullOrWhiteSpace($match.Groups[1].Value)) {
     return $match.Groups[1].Value.Trim()
   }
@@ -58,31 +74,56 @@ function Test-OllamaModel([string]$Url, [string]$ModelName) {
   return $false
 }
 
+# Windows PowerShell turns native stderr into terminating errors under "Stop".
+function Test-Docker([string[]]$Arguments) {
+  $previous = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    & docker @Arguments *> $null
+    return $LASTEXITCODE -eq 0
+  } finally {
+    $ErrorActionPreference = $previous
+  }
+}
+
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
   throw "Docker não foi encontrado. Instale o Docker Desktop e execute este instalador novamente."
 }
 
-docker compose version *> $null
-if ($LASTEXITCODE -ne 0) {
+if (-not (Test-Docker @("compose", "version"))) {
   throw "Docker Compose não está disponível. Atualize ou inicie o Docker Desktop."
 }
 
-docker info *> $null
-if ($LASTEXITCODE -ne 0) {
+if (-not (Test-Docker @("info"))) {
   throw "O Docker Desktop está instalado, mas não está iniciado. Abra-o e tente novamente."
 }
 
 if (-not (Test-Path $EnvPath)) {
   Copy-Item (Join-Path $ProjectRoot ".env.example") $EnvPath
+
+  # Data from an earlier installation was created with the example passwords.
+  $projectName = (Split-Path -Leaf $ProjectRoot).ToLowerInvariant() -replace "[^a-z0-9_-]", ""
+  if (Test-Docker @("volume", "inspect", "${projectName}_pgdata")) {
+    Write-Warning "Dados de uma instalação anterior foram encontrados; as senhas padrão foram mantidas para preservá-los."
+  } else {
+    $dbPassword = New-Secret
+    Set-EnvValue "POSTGRES_PASSWORD" $dbPassword
+    Set-EnvValue "DATABASE_URL" "postgresql://postgres:$dbPassword@db:5432/postgres"
+    Set-EnvValue "MINIO_ROOT_PASSWORD" (New-Secret)
+    Write-Host "Arquivo .env criado (senhas do banco e do armazenamento geradas)."
+  }
 }
 
-$envContent = Get-Content -Raw -Path $EnvPath
-$keyMatch = [regex]::Match($envContent, "(?m)^OPENAI_API_KEY=(.*)$")
+$envContent = Read-EnvFile
+$keyMatch = [regex]::Match($envContent, "(?m)^OPENAI_API_KEY=([^\r\n]*)")
 $needsProviderChoice = -not $keyMatch.Success -or $keyMatch.Groups[1].Value -eq "sk-your-openai-api-key"
 
 if ($needsProviderChoice) {
-  Write-Host "Escolha o provedor de IA. A chave é armazenada apenas no arquivo .env local."
-  $apiKey = Read-SecureText "Chave OpenAI (pressione Enter para usar apenas IA local)"
+  $apiKey = $env:OPENAI_API_KEY
+  if ([string]::IsNullOrWhiteSpace($apiKey) -and $env:CARIOCKKO_AI_PROVIDER -ne "ollama") {
+    Write-Host "Escolha o provedor de IA. A chave é armazenada apenas no arquivo .env local."
+    $apiKey = Read-SecureText "Chave OpenAI (pressione Enter para usar apenas IA local)"
+  }
 
   if (-not [string]::IsNullOrWhiteSpace($apiKey)) {
     Set-EnvValue "OPENAI_API_KEY" $apiKey
@@ -136,5 +177,7 @@ if (-not $ready) {
   throw "Os containers iniciaram, mas a interface não respondeu em http://localhost:3000. Verifique com 'docker compose logs'."
 }
 
-Start-Process "http://localhost:3000"
+if ($env:CARIOCKKO_NO_BROWSER -ne "1") {
+  Start-Process "http://localhost:3000"
+}
 Write-Host "Cariockko está aberto em http://localhost:3000"

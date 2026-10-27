@@ -15,7 +15,8 @@ A comparação parte do commit `950e60d` do original (merge do PR #16, *interact
 | Tema | Apenas claro | Modo claro e **modo escuro**, com preferência salva no navegador |
 | Visual | Minimalista em preto e branco com detalhes em vermelho | Novo visual com cartões arredondados, tons de índigo e página inicial redesenhada |
 | Exportação | Não havia | Exportação da lição em **PDF** compatível com o Projeto Palavras |
-| Instalação no Windows | Manual, via Docker | **Instalador** (Inno Setup) e script de configuração guiada |
+| Instalação | Manual: clonar, criar o `.env` e subir o Docker | **Um comando** no Windows, macOS e Linux, com `.env` e senhas gerados automaticamente; também há instalador `.exe` |
+| Versões | Sem versões publicadas | **Releases** no GitHub, publicadas automaticamente após todos os testes passarem |
 | Testes | Testes unitários da API e do web | Também testes de integração da API, testes E2E com Playwright e **CI no GitHub Actions** |
 | Documentação | README em português | README reescrito, versão em **inglês**, referência da API atualizada e novas capturas de tela |
 
@@ -84,19 +85,45 @@ O player da lição ganhou o botão **Exportar lição em PDF para projeto palav
 
 Além do conteúdo visível, o PDF leva nos metadados um pacote de estudo no formato do app **Aprendendo Palavras** (versão 3), com título, nível, texto, tradução e a primeira data de revisão. Assim, o arquivo pode ser importado diretamente por esse app. O PDF é gerado no próprio navegador, com a biblioteca `jspdf`.
 
-## 6. Instalador do Windows
+## 6. Instalação com um comando e releases
 
-Novidades para quem usa Windows sem experiência com terminal:
+No original, era preciso clonar o repositório, criar o `.env` à mão e subir o Docker. Aqui, com o Docker aberto, basta um comando:
 
-- **`installer/Cariockko.iss`:** script do Inno Setup que gera um instalador com atalhos no menu Iniciar e na área de trabalho. Ao desinstalar, os contêineres são parados.
-- **`scripts/install-windows.ps1`:** confere se o Docker Desktop está instalado e rodando, cria o `.env`, pede a chave da OpenAI (sem mostrá-la na tela) ou, se ela não for informada, verifica se os serviços de IA local estão prontos. Depois sobe os contêineres e abre o app no navegador.
+```powershell
+# Windows
+irm https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.ps1 | iex
+```
+
+```bash
+# macOS e Linux
+curl -fsSL https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.sh | bash
+```
+
+O instalador:
+
+- confere se o Docker está instalado e rodando;
+- baixa a última versão publicada;
+- cria o `.env` com **senhas aleatórias** para o banco e o MinIO, em vez das senhas fixas do exemplo;
+- pede a chave da OpenAI sem mostrá-la na tela ou, se ela não for informada, verifica se a IA local está pronta;
+- sobe os contêineres e abre o app no navegador.
+
+Rodar o mesmo comando de novo **atualiza** o app, mantendo o `.env` e os dados. Com `--uninstall` (ou `-Uninstall` no Windows), ele **desinstala**, perguntando se os dados também devem ser apagados.
+
+Os arquivos envolvidos:
+
+- **`scripts/install.sh`:** instalador de macOS e Linux.
+- **`scripts/install.ps1`:** instalador do Windows; baixa a versão e chama o script abaixo.
+- **`scripts/install-windows.ps1`:** configura e inicia o app no Windows. Também é usado pelo instalador `.exe`.
+- **`installer/Cariockko.iss`:** script do Inno Setup que gera um instalador `.exe` com atalhos no menu Iniciar e na área de trabalho.
+
+O comando de instalação baixa sempre a **última release publicada**, não o código mais recente do `main`. Uma release é criada ao enviar uma tag de versão (por exemplo `v0.2.0`): o workflow `.github/workflows/release.yml` roda todos os testes e só publica se eles passarem.
 
 ## 7. Testes e integração contínua
 
 - **API:** o app Express foi extraído para `createApp()` (`api/src/app.ts`), o que permitiu testes de integração das rotas com `supertest`, além de testes para a rota de configurações.
 - **Web:** testes para o botão de tema e para a geração do pacote de estudo do PDF.
 - **E2E:** testes com Playwright usando uma API simulada (`web/e2e/mock-api.mjs`). Eles cobrem a persistência do modo escuro entre páginas e a exportação do PDF. Há também um teste que gera as capturas de tela do README.
-- **CI:** workflow do GitHub Actions (`.github/workflows/ci.yml`) que roda testes, checagem de tipos, build da API e testes E2E a cada push e pull request.
+- **CI:** workflow do GitHub Actions (`.github/workflows/ci.yml`) que roda testes, checagem de tipos, build da API e testes E2E a cada push e pull request. Ele também instala, atualiza e desinstala o app com o `install.sh` num Linux com Docker.
 - **Scripts na raiz:** `npm test`, `npm run typecheck`, `npm run test:e2e` e `npm run test:ci`.
 
 ## 8. Documentação

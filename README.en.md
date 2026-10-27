@@ -100,6 +100,79 @@ Switch themes with **Theme** in the navigation. The preference is saved in the b
 
 ## Quick start
 
+With Docker installed and running, a single command downloads the latest published release, creates the configuration, and opens the app in your browser.
+
+**Windows** (in PowerShell):
+
+```powershell
+irm https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.ps1 | iex
+```
+
+**macOS and Linux** (in Terminal):
+
+```bash
+curl -fsSL https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.sh | bash
+```
+
+The installer:
+
+1. checks that Docker is installed and running;
+2. downloads the [latest published release](https://github.com/Joshpcbrrj/cariockko/releases/latest) of Cariockko;
+3. creates `.env` with random database and storage passwords;
+4. asks for your OpenAI key without showing it. If you press Enter without typing one, it checks whether [local AI](#local-ai-with-ollama) is ready and uses that mode;
+5. starts the services and opens [http://localhost:3000](http://localhost:3000).
+
+| System | Installation folder |
+|---|---|
+| Windows | `%LOCALAPPDATA%\Programs\Cariockko` |
+| macOS and Linux | `~/cariockko` |
+
+**Update:** run the same command again. The code is replaced with the latest release; `.env` and your data (lessons, audio, and progress) are kept.
+
+**Uninstall:** the installer asks whether to delete your data as well.
+
+```powershell
+# Windows
+& ([scriptblock]::Create((irm https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.ps1))) -Uninstall
+```
+
+```bash
+# macOS and Linux
+curl -fsSL https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.sh | bash -s -- --uninstall
+```
+
+<details>
+<summary>Advanced installer options</summary>
+
+Set these environment variables before running the command:
+
+| Variable | Effect |
+|---|---|
+| `CARIOCKKO_DIR` | Installs to a different folder |
+| `CARIOCKKO_VERSION` | Installs a specific release, for example `v0.2.0` |
+| `OPENAI_API_KEY` | Uses this key without asking |
+| `CARIOCKKO_AI_PROVIDER=ollama` | Chooses local AI without asking |
+| `CARIOCKKO_DELETE_DATA=1` | Deletes data on uninstall without asking (`0` keeps it) |
+| `CARIOCKKO_NO_BROWSER=1` | Does not open the browser at the end |
+
+Example on macOS and Linux: `curl -fsSL .../install.sh | CARIOCKKO_DIR=~/apps/cariockko bash`. On Windows: `$env:CARIOCKKO_DIR = "D:\Apps\Cariockko"` before the command.
+
+</details>
+
+Prefer to read the script before running it? See [scripts/install.sh](scripts/install.sh) and [scripts/install.ps1](scripts/install.ps1). You can also download it first and run it afterwards:
+
+```bash
+curl -fsSLO https://github.com/Joshpcbrrj/cariockko/releases/latest/download/install.sh
+less install.sh
+bash install.sh
+```
+
+The installer does not include Docker, Ollama, or AI models.
+
+### Manual installation
+
+For development, or to install without the script:
+
 1. Clone the repository:
 
    ```bash
@@ -118,6 +191,8 @@ Switch themes with **Theme** in the navigation. The preference is saved in the b
    ```powershell
    Copy-Item .env.example .env
    ```
+
+   If other people can reach the app, change `POSTGRES_PASSWORD` (and the password inside `DATABASE_URL`) and `MINIO_ROOT_PASSWORD` before the first start.
 
 3. Configure your preferred provider as described in [AI providers](#ai-providers-cloud-and-local).
 4. Start the services:
@@ -199,13 +274,17 @@ Download the configured Ollama model before use, for example:
 ollama pull llama3.1
 ```
 
+On Linux, Ollama only accepts connections from the same machine by default, so the API container cannot reach it. Set `OLLAMA_HOST=0.0.0.0` on the Ollama service (for example with `sudo systemctl edit ollama`) and restart it.
+
 The example addresses assume audio services that support the compatible routes `/v1/models`, `/v1/audio/transcriptions`, and `/v1/audio/speech`. These servers and local models are **not included** in Cariockko or its installer.
 
 Under **Settings**, the app checks the Ollama model, STT, and TTS, and enables local selection only when all are responding. AI features can run without sending content to OpenAI in this mode, but the models and services must be installed first. Initial model downloads require internet; after that, processing can run locally as long as those services are running. Docker, the database, and MinIO must also be running.
 
 ## Windows installer
 
-The [scripts/install-windows.ps1](scripts/install-windows.ps1) script checks for Docker Desktop, prepares `.env`, securely prompts for an OpenAI key when applicable, runs `docker compose up -d --build`, and opens the app in a browser.
+Besides the [quick start](#quick-start), there is a traditional `.exe` installer.
+
+The [scripts/install-windows.ps1](scripts/install-windows.ps1) script checks for Docker Desktop, creates `.env` with random passwords, securely prompts for an OpenAI key when applicable, runs `docker compose up -d --build`, and opens the app in a browser. It is used both by the `.exe` installer and by [scripts/install.ps1](scripts/install.ps1), which downloads the latest published release and runs it.
 
 [installer/Cariockko.iss](installer/Cariockko.iss) is the Inno Setup recipe for a `.exe` installer with Start Menu and optional desktop shortcuts. Compile it with Inno Setup from the repository root. The compiled executable is not versioned; the installer does not bundle Docker Desktop, Ollama, or AI models.
 
@@ -308,7 +387,22 @@ cd web
 npx playwright install chromium
 ```
 
-The [.github/workflows/ci.yml](.github/workflows/ci.yml) workflow runs checks on pull requests and pushes to `main`/`master`. Playwright reports are uploaded when available.
+The [.github/workflows/ci.yml](.github/workflows/ci.yml) workflow runs checks on pull requests and pushes to `main`/`master`. Playwright reports are uploaded when available. The same workflow also tests the macOS and Linux installer end to end: it installs with Docker, checks the app, updates, and uninstalls.
+
+### Publishing a new release
+
+The install command always downloads the **latest published release**, not the newest code on `main`. To publish a release:
+
+1. Update `AppVersion` in [installer/Cariockko.iss](installer/Cariockko.iss) and `version` in the root [package.json](package.json).
+2. Commit and push to `main`.
+3. Create and push the version tag:
+
+   ```bash
+   git tag v0.3.0
+   git push origin v0.3.0
+   ```
+
+The [.github/workflows/release.yml](.github/workflows/release.yml) workflow runs every check and, if they pass, publishes the release with generated notes and the installers attached. If any check fails, nothing is published and new installs keep getting the previous release.
 
 Refresh the screenshots used in this README with the documentation screenshot test:
 
@@ -360,7 +454,7 @@ docker compose run --rm api npm run seed-lessons
 
 ```text
 .
-├── .github/workflows/ci.yml     # GitHub Actions CI
+├── .github/workflows/           # GitHub Actions CI and release publishing
 ├── api/
 │   ├── src/agents/              # Content Producer, lesson generator, speaking tutor
 │   ├── src/lib/                 # Database, AI, storage, SSE, and job queue
@@ -370,7 +464,7 @@ docker compose run --rm api npm run seed-lessons
 ├── db/                          # PostgreSQL initialization
 ├── docs/screenshots/            # Images used by this documentation
 ├── installer/                   # Inno Setup recipe
-├── scripts/                     # Utility scripts, including installer
+├── scripts/                     # Installers (Windows, macOS, and Linux)
 ├── web/
 │   ├── src/app/                 # Next.js pages
 │   ├── src/components/          # UI components
@@ -403,6 +497,6 @@ This project is a fork of the [original Cariockko repository](https://github.com
 
 ## Differences from the original
 
-This fork adds local AI with Ollama, a settings page, dark mode, a redesigned interface, lesson PDF export, a Windows installer, E2E tests with CI, and English documentation to the original project.
+This fork adds local AI with Ollama, a settings page, dark mode, a redesigned interface, lesson PDF export, one-command installation on Windows, macOS, and Linux, versioned releases, E2E tests with CI, and English documentation to the original project.
 
 See the full breakdown (in Portuguese) in [DIFERENCAS.md](DIFERENCAS.md).

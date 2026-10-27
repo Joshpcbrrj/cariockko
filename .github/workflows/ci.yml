@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main, master]
+  workflow_call:
 
 permissions:
   contents: read
@@ -71,3 +72,59 @@ jobs:
             web/playwright-report/
             web/test-results/
           if-no-files-found: ignore
+
+  install-script:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CARIOCKKO_SOURCE_DIR: ${{ github.workspace }}
+      CARIOCKKO_DIR: /tmp/cariockko
+      CARIOCKKO_VERSION: ci
+      CARIOCKKO_NO_BROWSER: "1"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Lint shell scripts
+        run: shellcheck scripts/install.sh
+
+      - name: Check that install.ps1 is ASCII-only
+        run: |
+          if LC_ALL=C grep -nP '[^\x00-\x7F]' scripts/install.ps1; then
+            echo "scripts/install.ps1 must be ASCII-only; write accents as \\u00e3 escapes."
+            exit 1
+          fi
+
+      - name: Install with the script
+        run: bash scripts/install.sh < /dev/null
+        env:
+          OPENAI_API_KEY: sk-ci-placeholder
+
+      - name: Check the running application
+        run: |
+          curl -fsS http://localhost:3000 > /dev/null
+          curl -fsS http://localhost:3001/health/ready
+          grep -q '^AI_PROVIDER=openai$' "$CARIOCKKO_DIR/.env"
+          if grep -q '^POSTGRES_PASSWORD=local-dev-password$' "$CARIOCKKO_DIR/.env"; then
+            echo "The installer kept the example database password."
+            exit 1
+          fi
+
+      - name: Update keeps the configuration
+        run: |
+          before="$(sha256sum "$CARIOCKKO_DIR/.env")"
+          bash scripts/install.sh < /dev/null
+          after="$(sha256sum "$CARIOCKKO_DIR/.env")"
+          test "$before" = "$after"
+          curl -fsS http://localhost:3001/health/ready
+
+      - name: Uninstall
+        run: |
+          CARIOCKKO_DELETE_DATA=1 bash scripts/install.sh --uninstall < /dev/null
+          test ! -e "$CARIOCKKO_DIR"
+          test -z "$(docker ps -q --filter name=cariockko)"
+
+      - name: Show container logs
+        if: failure()
+        run: cd "$CARIOCKKO_DIR" && docker compose logs --tail 200
